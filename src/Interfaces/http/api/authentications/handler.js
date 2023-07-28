@@ -1,50 +1,50 @@
-const LoginUserUseCase = require('../../../../Applications/use_case/LoginUserUseCase');
-const RefreshAuthenticationUseCase = require('../../../../Applications/use_case/RefreshAuthenticationUseCase');
-const LogoutUserUseCase = require('../../../../Applications/use_case/LogoutUserUseCase');
+const LoginUserUseCase = require('../../../../Applications/use_case/LoginUserUseCase')
+const RefreshAuthenticationUseCase = require('../../../../Applications/use_case/RefreshAuthenticationUseCase')
+const LogoutUserUseCase = require('../../../../Applications/use_case/LogoutUserUseCase')
 
 class AuthenticationsHandler {
-  constructor(container) {
-    this._container = container;
+  constructor (container) {
+    this._container = container
 
-    this.postAuthenticationHandler = this.postAuthenticationHandler.bind(this);
-    this.putAuthenticationHandler = this.putAuthenticationHandler.bind(this);
-    this.deleteAuthenticationHandler = this.deleteAuthenticationHandler.bind(this);
+    this.postAuthenticationHandler = this.postAuthenticationHandler.bind(this)
+    this.putAuthenticationHandler = this.putAuthenticationHandler.bind(this)
+    this.deleteAuthenticationHandler = this.deleteAuthenticationHandler.bind(this)
   }
 
-  async postAuthenticationHandler(request, h) {
-    const loginUserUseCase = this._container.getInstance(LoginUserUseCase.name);
-    const { accessToken, refreshToken } = await loginUserUseCase.execute(request.payload);
+  async postAuthenticationHandler (request, h) {
+    const loginUserUseCase = this._container.getInstance(LoginUserUseCase.name)
+    const { accessToken, refreshToken } = await loginUserUseCase.execute(request.payload)
     const response = h.response({
       status: 'success',
       data: {
         accessToken,
-        refreshToken,
-      },
-    });
-    response.code(201);
-    return response;
+        refreshToken
+      }
+    })
+    response.code(201)
+    return response
   }
 
-  async putAuthenticationHandler(request) {
+  async putAuthenticationHandler (request) {
     const refreshAuthenticationUseCase = this._container
-      .getInstance(RefreshAuthenticationUseCase.name);
-    const accessToken = await refreshAuthenticationUseCase.execute(request.payload);
+      .getInstance(RefreshAuthenticationUseCase.name)
+    const accessToken = await refreshAuthenticationUseCase.execute(request.payload)
 
     return {
       status: 'success',
       data: {
-        accessToken,
-      },
-    };
+        accessToken
+      }
+    }
   }
 
-  async deleteAuthenticationHandler(request) {
-    const logoutUserUseCase = this._container.getInstance(LogoutUserUseCase.name);
-    await logoutUserUseCase.execute(request.payload);
+  async deleteAuthenticationHandler (request) {
+    const logoutUserUseCase = this._container.getInstance(LogoutUserUseCase.name)
+    await logoutUserUseCase.execute(request.payload)
     return {
-      status: 'success',
-    };
+      status: 'success'
+    }
   }
 }
 
-module.exports = AuthenticationsHandler;
+module.exports = AuthenticationsHandler
