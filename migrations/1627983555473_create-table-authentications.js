@@ -1,14 +1,12 @@
-/* eslint-disable camelcase */
-
 exports.up = (pgm) => {
   pgm.createTable('authentications', {
     token: {
       type: 'TEXT',
-      notNull: true,
-    },
-  });
-};
+      notNull: true
+    }
+  })
+}
 
 exports.down = (pgm) => {
-  pgm.dropTable('authentications');
-};
+  pgm.dropTable('authentications')
+}
