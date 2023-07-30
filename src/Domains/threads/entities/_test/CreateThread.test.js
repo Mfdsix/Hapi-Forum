@@ -15,7 +15,8 @@ describe('a CreateThread entities', () => {
     // Arrange
     const payload = {
       title: 123,
-      body: true
+      body: true,
+      owner: {}
     }
 
     // Action and Assert
@@ -26,7 +27,8 @@ describe('a CreateThread entities', () => {
     // Arrange
     const payload = {
       title: 'dicodingindonesiadicodingindonesiadicodingindonesiadicoding',
-      body: 'Dicoding Indonesia'
+      body: 'Dicoding Indonesia',
+      owner: 'owner'
     }
 
     // Action and Assert
@@ -37,7 +39,8 @@ describe('a CreateThread entities', () => {
     // Arrange
     const payload = {
       title: 'dico ding &64256?',
-      body: 'dicoding'
+      body: 'dicoding',
+      owner: 'owner'
     }
 
     // Action and Assert
@@ -48,7 +51,8 @@ describe('a CreateThread entities', () => {
     // Arrange
     const payload = {
       title: 'dicoding',
-      body: 'Dicoding Indonesia'
+      body: 'Dicoding Indonesia',
+      owner: 'owner'
     }
 
     // Action
@@ -63,7 +67,8 @@ describe('a CreateThread entities', () => {
     // Arrange
     const payload = {
       title: 'dicoding123 !? .,',
-      body: 'Dicoding Indonesia'
+      body: 'Dicoding Indonesia',
+      owner: 'owner'
     }
 
     // Action
