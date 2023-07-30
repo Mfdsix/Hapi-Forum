@@ -3,8 +3,8 @@ class UpdateByIdThreadUseCase {
     this._threadRepository = threadRepository
   }
 
-  async execute (useCasePayload) {
-    return this._threadRepository.updateById(useCasePayload.id, useCasePayload)
+  async execute (dataId, useCasePayload) {
+    return this._threadRepository.updateById(dataId, useCasePayload)
   }
 }
 
