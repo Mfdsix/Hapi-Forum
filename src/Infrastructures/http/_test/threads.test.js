@@ -1,5 +1,7 @@
 const pool = require('../../database/postgres/pool')
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper')
+const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper')
+const AuthenticateTestHelper = require('../../../../tests/AuthenticateTestHelper')
 const container = require('../../container')
 const createServer = require('../createServer')
 
@@ -10,6 +12,7 @@ describe('/threads endpoint', () => {
 
   afterEach(async () => {
     await ThreadsTableTestHelper.cleanTable()
+    await UsersTableTestHelper.cleanTable()
   })
 
   describe('when GET /threads', () => {
@@ -64,7 +67,7 @@ describe('/threads endpoint', () => {
 
       // Assert
       const responseJson = JSON.parse(response.payload)
-      expect(response.statusCode).toEqual(400)
+      expect(response.statusCode).toEqual(404)
       expect(responseJson.status).toEqual('fail')
     })
 
@@ -86,6 +89,145 @@ describe('/threads endpoint', () => {
       expect(responseJson.data.thread).toHaveProperty('id')
       expect(responseJson.data.thread).toHaveProperty('title')
       expect(responseJson.data.thread.id).toEqual(threadId)
+    })
+  })
+
+  describe('when POST /threads', () => {
+    it('should response 401 when not login', async () => {
+      const payload = {
+        title: 'title',
+        body: 'body of title'
+      }
+      const server = await createServer(container)
+
+      // Action
+      const response = await server.inject({
+        method: 'POST',
+        url: '/threads',
+        payload
+      })
+
+      // Assert
+      const responseJson = JSON.parse(response.payload)
+      expect(response.statusCode).toEqual(401)
+      expect(responseJson.error).toEqual('Unauthorized')
+    })
+
+    it('should response 400 when invalid body', async () => {
+      const { accessToken } = await AuthenticateTestHelper.createUserAndLogin()
+      const payload = {
+        title: true,
+        body: {}
+      }
+      const server = await createServer(container)
+
+      // Action
+      const response = await server.inject({
+        headers: {
+          Authorization: 'Bearer ' + accessToken
+        },
+        method: 'POST',
+        url: '/threads',
+        payload
+      })
+
+      // Assert
+      const responseJson = JSON.parse(response.payload)
+      expect(response.statusCode).toEqual(400)
+      expect(responseJson.status).toEqual('fail')
+    })
+
+    it('should response 201 when valid body', async () => {
+      const { accessToken } = await AuthenticateTestHelper.createUserAndLogin()
+      const payload = {
+        title: 'title',
+        body: 'body of title'
+      }
+      const server = await createServer(container)
+
+      // Action
+      const response = await server.inject({
+        headers: {
+          Authorization: 'Bearer ' + accessToken
+        },
+        method: 'POST',
+        url: '/threads',
+        payload
+      })
+
+      // Assert
+      const responseJson = JSON.parse(response.payload)
+      expect(response.statusCode).toEqual(201)
+      expect(responseJson.status).toEqual('success')
+    })
+  })
+
+  describe('when PUT /threads/{id}', () => {
+    it('should response 401 when not login', async () => {
+      const payload = {
+        title: 'title',
+        body: 'body of title'
+      }
+      const server = await createServer(container)
+
+      // Action
+      const response = await server.inject({
+        method: 'PUT',
+        url: '/threads/1',
+        payload
+      })
+
+      // Assert
+      const responseJson = JSON.parse(response.payload)
+      expect(response.statusCode).toEqual(401)
+      expect(responseJson.error).toEqual('Unauthorized')
+    })
+
+    it('should response 400 when invalid body', async () => {
+      const { accessToken } = await AuthenticateTestHelper.createUserAndLogin()
+      const payload = {
+        title: true,
+        body: {}
+      }
+      const server = await createServer(container)
+      // Action
+      const response = await server.inject({
+        headers: {
+          Authorization: 'Bearer ' + accessToken
+        },
+        method: 'PUT',
+        url: '/threads/1',
+        payload
+      })
+
+      // Assert
+      const responseJson = JSON.parse(response.payload)
+      expect(response.statusCode).toEqual(400)
+      expect(responseJson.status).toEqual('fail')
+    })
+
+    it('should response 404 when not no data', async () => {
+      const payload = {
+        title: 'title',
+        body: 'body of title'
+      }
+      const server = await createServer(container)
+      const { accessToken } = await AuthenticateTestHelper.createUserAndLogin()
+
+      // Action
+      const response = await server.inject({
+        method: 'PUT',
+        url: '/threads/1',
+        headers: {
+          Authorization: 'Bearer ' + accessToken
+        },
+        payload
+      })
+
+      // Assert
+      const responseJson = JSON.parse(response.payload)
+      expect(response.statusCode).toEqual(404)
+      expect(responseJson.status).toEqual('fail')
     })
   })
 })

@@ -1,8 +1,8 @@
 const GetAllThreadsUseCase = require('../../../../Applications/use_case/threads/GetAllThreadsUseCase')
 const GetByIdThreadUseCase = require('../../../../Applications/use_case/threads/GetByIdThreadUseCase')
 const CreateThreadUseCase = require('../../../../Applications/use_case/threads/CreateThreadUseCase')
-const UpdateByIdThreadUseCase = require('../../../../Applications/use_case/threads/UpdateByIdUseCase')
-const DeleteByIdUseCase = require('../../../../Applications/use_case/threads/DeleteByIdUseCase')
+const UpdateThreadByIdUseCase = require('../../../../Applications/use_case/threads/UpdateThreadByIdUseCase')
+const DeleteThreadByIdUseCase = require('../../../../Applications/use_case/threads/DeleteThreadByIdUseCase')
 
 const HttpResponse = require('../../../../Commons/HttpResponse')
 const autoBind = require('auto-bind')
@@ -38,8 +38,8 @@ class ThreadsHandler {
     })
   }
 
-  async postHandler (request) {
-    const { title, body } = request.params
+  async postHandler (request, h) {
+    const { title, body } = request.payload
     const { id: credentialId } = request.auth.credentials
     const useCase = this._container.getInstance(CreateThreadUseCase.name)
 
@@ -49,22 +49,27 @@ class ThreadsHandler {
       owner: credentialId
     })
 
-    return HttpResponse.success({
+    const response = h.response(HttpResponse.success({
       message: 'thread berhasil dibuat',
       data: thread.id
-    })
+    }))
+    response.code(201)
+
+    return response
   }
 
   async putByIdHandler (request) {
     const { id } = request.params
-    const { title, body } = request.params
+    const { title, body } = request.payload
     const { id: credentialId } = request.auth.credentials
-    const useCase = this._container.getInstance(UpdateByIdThreadUseCase.name)
 
-    const updatedId = await useCase.execute(id, {
+    const useCase = this._container.getInstance(UpdateThreadByIdUseCase.name)
+
+    const updatedId = await useCase.execute({
+      id,
       title,
       body,
-      owner: credentialId
+      userId: credentialId
     })
 
     return HttpResponse.success({
@@ -75,12 +80,16 @@ class ThreadsHandler {
 
   async deleteByIdHandler (request) {
     const { id } = request.params
-    const useCase = this._container.getInstance(DeleteByIdUseCase.name)
+    const { id: credentialId } = request.auth.credentials
+    const useCase = this._container.getInstance(DeleteThreadByIdUseCase.name)
 
-    const deletedId = await useCase.execute(id)
+    const deletedId = await useCase.execute({
+      id,
+      userId: credentialId
+    })
 
     return HttpResponse.success({
-      message: 'thread berhasil diupdate',
+      message: 'thread berhasil dihapus',
       data: deletedId
     })
   }

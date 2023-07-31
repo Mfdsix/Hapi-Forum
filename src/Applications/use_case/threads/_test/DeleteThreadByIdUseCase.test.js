@@ -1,20 +1,23 @@
 const ThreadRepository = require('../../../../Domains/threads/ThreadRepository')
-const DeleteByIdThreadUseCase = require('../DeleteByIdUseCase')
+const DeleteThreadByIdThreadUseCase = require('../DeleteThreadByIdUseCase')
 
 describe('DeleteByIdThreadUseCase', () => {
   it('should orchestrating the delete thread by id action correctly', async () => {
     // Arrange
-    const useCasePayload = 'thread-123'
+    const useCasePayload = {
+      id: 'thread-123',
+      userId: 'user-1'
+    }
     const mockThreadRepository = new ThreadRepository()
 
     // Mocking
     mockThreadRepository.deleteById = jest.fn()
-      .mockImplementation((id) => Promise.resolve({
+      .mockImplementation(({ id, userId }) => Promise.resolve({
         id
       }))
 
     // create use case instance
-    const deleteByIdThreadUseCase = new DeleteByIdThreadUseCase({
+    const deleteByIdThreadUseCase = new DeleteThreadByIdThreadUseCase({
       threadRepository: mockThreadRepository
     })
 
@@ -23,7 +26,7 @@ describe('DeleteByIdThreadUseCase', () => {
 
     // Assert
     expect(deleted).toEqual({
-      id: useCasePayload
+      id: useCasePayload.id
     })
   })
 })

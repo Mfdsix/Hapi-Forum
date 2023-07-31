@@ -29,8 +29,8 @@ const RefreshAuthenticationUseCase = require('../Applications/use_case/authentic
 const GetAllThreadsUseCase = require('../Applications/use_case/threads/GetAllThreadsUseCase')
 const GetByIdThreadUseCase = require('../Applications/use_case/threads/GetByIdThreadUseCase')
 const CreateThreadUseCase = require('../Applications/use_case/threads/CreateThreadUseCase')
-const UpdateByIdUseCase = require('../Applications/use_case/threads/UpdateByIdUseCase')
-const DeleteByIdUseCase = require('../Applications/use_case/threads/DeleteByIdUseCase')
+const UpdateThreadByIdUseCase = require('../Applications/use_case/threads/UpdateThreadByIdUseCase')
+const DeleteThreadByIdUseCase = require('../Applications/use_case/threads/DeleteThreadByIdUseCase')
 
 const ThreadRepositoryPostgres = require('./repository/ThreadRepositoryPostgres')
 
@@ -217,8 +217,8 @@ container.register([
     }
   },
   {
-    key: UpdateByIdUseCase.name,
-    Class: UpdateByIdUseCase,
+    key: UpdateThreadByIdUseCase.name,
+    Class: UpdateThreadByIdUseCase,
     parameter: {
       injectType: 'destructuring',
       dependencies: [
@@ -230,8 +230,8 @@ container.register([
     }
   },
   {
-    key: DeleteByIdUseCase.name,
-    Class: DeleteByIdUseCase,
+    key: DeleteThreadByIdUseCase.name,
+    Class: DeleteThreadByIdUseCase,
     parameter: {
       injectType: 'destructuring',
       dependencies: [

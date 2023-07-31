@@ -1,5 +1,7 @@
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper')
+const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError')
 const InvariantError = require('../../../Commons/exceptions/InvariantError')
+const NotFoundError = require('../../../Commons/exceptions/NotFoundError')
 const CreateThread = require('../../../Domains/threads/entities/CreateThread')
 const CreatedThread = require('../../../Domains/threads/entities/CreatedThread')
 const pool = require('../../database/postgres/pool')
@@ -50,7 +52,7 @@ describe('ThreadRepositoryPostgres', () => {
       // Action & Assert
       const threads = threadRepositoryPostgres.getById('unique-id')
 
-      await expect(threads).rejects.toThrow(new InvariantError('thread tidak ditemukan'))
+      await expect(threads).rejects.toThrow(new NotFoundError('thread tidak ditemukan'))
     })
 
     it('should throw data when found', async () => {
@@ -101,25 +103,46 @@ describe('ThreadRepositoryPostgres', () => {
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {})
 
       // Action & Assert
-      const threads = threadRepositoryPostgres.updateById('unique-id', {
+      const threads = threadRepositoryPostgres.updateById({
+        id: 'unique-id',
         title: 'test',
-        body: 'body of test'
+        body: 'body of test',
+        userId: 'owner'
       })
 
-      await expect(threads).rejects.toThrow(new InvariantError('thread tidak ditemukan'))
+      await expect(threads).rejects.toThrow(new NotFoundError('thread tidak ditemukan'))
+    })
+
+    it('should throw error when not owner of thread', async () => {
+      // Arrange
+      await ThreadsTableTestHelper.seed()
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {})
+
+      // Action
+      const updated = threadRepositoryPostgres.updateById({
+        id: 'thread-123',
+        title: 'update title',
+        body: 'update body',
+        userId: 'user-random'
+      })
+
+      // Assert
+      await expect(updated).rejects.toThrow(new AuthorizationError('tidak dapat mengakses thread'))
     })
 
     it('should update thread by id correctly', async () => {
       // Arrange
-      await ThreadsTableTestHelper.seed({ id: 'thread-123' })
+      await ThreadsTableTestHelper.seed()
       const updateThread = {
+        id: 'thread-123',
         title: 'updated test',
-        body: 'updated body of test'
+        body: 'updated body of test',
+        userId: 'user-1'
       }
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {})
 
       // Action
-      const updated = await threadRepositoryPostgres.updateById('thread-123', updateThread)
+      const updated = await threadRepositoryPostgres.updateById(updateThread)
       const getOne = await threadRepositoryPostgres.getById('thread-123')
 
       // Assert
@@ -135,23 +158,44 @@ describe('ThreadRepositoryPostgres', () => {
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {})
 
       // Action & Assert
-      const threads = threadRepositoryPostgres.deleteById('unique-id')
+      const threads = threadRepositoryPostgres.deleteById({
+        id: 'unique-id',
+        userId: 'user-1'
+      })
 
-      await expect(threads).rejects.toThrow(new InvariantError('thread tidak ditemukan'))
+      await expect(threads).rejects.toThrow(new NotFoundError('thread tidak ditemukan'))
+    })
+
+    it('should throw error when not owner of thread', async () => {
+      // Arrange
+      await ThreadsTableTestHelper.seed()
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {})
+
+      // Action
+      const deleted = threadRepositoryPostgres.deleteById({
+        id: 'thread-123',
+        userId: 'user-random'
+      })
+
+      // Assert
+      await expect(deleted).rejects.toThrow(new AuthorizationError('tidak dapat mengakses thread'))
     })
 
     it('should delete thread by id correctly', async () => {
       // Arrange
-      await ThreadsTableTestHelper.seed({ id: 'thread-123' })
+      await ThreadsTableTestHelper.seed()
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {})
 
       // Action
-      const deleted = await threadRepositoryPostgres.deleteById('thread-123')
+      const deleted = await threadRepositoryPostgres.deleteById({
+        id: 'thread-123',
+        userId: 'user-1'
+      })
       const getOne = threadRepositoryPostgres.getById('thread-123')
 
       // Assert
       expect(deleted).toEqual('thread-123')
-      await expect(getOne).rejects.toThrow(new InvariantError('thread tidak ditemukan'))
+      await expect(getOne).rejects.toThrow(new NotFoundError('thread tidak ditemukan'))
     })
   })
 })

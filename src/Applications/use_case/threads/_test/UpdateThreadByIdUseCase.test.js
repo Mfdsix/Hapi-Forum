@@ -1,33 +1,34 @@
 const ThreadRepository = require('../../../../Domains/threads/ThreadRepository')
-const UpdateByIdThreadUseCase = require('../UpdateByIdUseCase')
+const UpdateThreadByIdUseCase = require('../UpdateThreadByIdUseCase')
 
 describe('UpdateByIdThreadUseCase', () => {
   it('should orchestrating the update thread by id action correctly', async () => {
     // Arrange
-    const dataId = 'thread-123'
     const useCasePayload = {
+      id: 'thread-123',
       title: 'test',
-      body: 'body of test'
+      body: 'body of test',
+      userId: 'user-1'
     }
     const mockThreadRepository = new ThreadRepository()
 
     // Mocking
     mockThreadRepository.updateById = jest.fn()
-      .mockImplementation((id, payload) => Promise.resolve({
-        id
+      .mockImplementation((payload) => Promise.resolve({
+        id: payload.id
       }))
 
     // create use case instance
-    const updateByIdThreadUseCase = new UpdateByIdThreadUseCase({
+    const updateByIdThreadUseCase = new UpdateThreadByIdUseCase({
       threadRepository: mockThreadRepository
     })
 
     // Action
-    const updated = await updateByIdThreadUseCase.execute(dataId, useCasePayload)
+    const updated = await updateByIdThreadUseCase.execute(useCasePayload)
 
     // Assert
     expect(updated).toEqual({
-      id: dataId
+      id: useCasePayload.id
     })
   })
 })

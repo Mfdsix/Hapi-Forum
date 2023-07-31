@@ -1,4 +1,6 @@
 const Hapi = require('@hapi/hapi')
+const JWT = require('@hapi/jwt')
+
 const ClientError = require('../../Commons/exceptions/ClientError')
 const DomainErrorTranslator = require('../../Commons/exceptions/DomainErrorTranslator')
 
@@ -10,6 +12,27 @@ const createServer = async (container) => {
   const server = Hapi.server({
     host: process.env.HOST,
     port: process.env.PORT
+  })
+
+  await server.register([
+    {
+      plugin: JWT
+    }
+  ])
+  server.auth.strategy('forumapp_jwt', 'jwt', {
+    keys: process.env.ACCESS_TOKEN_KEY,
+    verify: {
+      aud: false,
+      iss: false,
+      sub: false,
+      maxAgeSec: process.env.ACCESS_TOKEN_AGE
+    },
+    validate: (artifacts) => ({
+      isValid: true,
+      credentials: {
+        id: artifacts.decoded.payload.id
+      }
+    })
   })
 
   await server.register([

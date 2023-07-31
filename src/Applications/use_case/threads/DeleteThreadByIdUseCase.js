@@ -1,4 +1,4 @@
-class DeleteByIdThreadUseCase {
+class DeleteThreadByIdThreadUseCase {
   constructor ({ threadRepository }) {
     this._threadRepository = threadRepository
   }
@@ -8,4 +8,4 @@ class DeleteByIdThreadUseCase {
   }
 }
 
-module.exports = DeleteByIdThreadUseCase
+module.exports = DeleteThreadByIdThreadUseCase

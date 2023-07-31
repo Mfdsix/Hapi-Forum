@@ -1,4 +1,5 @@
-const InvariantError = require('../../Commons/exceptions/InvariantError')
+const NotFoundError = require('../../Commons/exceptions/NotFoundError')
+const AuthorizationError = require('../../Commons/exceptions/AuthorizationError')
 const CreatedThread = require('../../Domains/threads/entities/CreatedThread')
 const ThreadRepository = require('../../Domains/threads/ThreadRepository')
 
@@ -24,7 +25,7 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     const result = await this._pool.query(query)
 
     if (result.rows.length !== 1) {
-      throw new InvariantError('thread tidak ditemukan')
+      throw new NotFoundError('thread tidak ditemukan')
     }
 
     return result.rows[0]
@@ -45,31 +46,37 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     return new CreatedThread({ ...result.rows[0] })
   }
 
-  async updateById (id, payload) {
-    const { title, body } = payload
+  async updateById (payload) {
+    const { id, title, body, userId } = payload
+
+    await this.getById(id)
 
     const query = {
-      text: 'UPDATE threads SET title = $1, body = $2 WHERE id = $3 RETURNING id',
-      values: [title, body, id]
+      text: 'UPDATE threads SET title = $1, body = $2 WHERE id = $3 AND owner = $4 RETURNING id',
+      values: [title, body, id, userId]
     }
     const result = await this._pool.query(query)
 
     if (result.rows.length !== 1) {
-      throw new InvariantError('thread tidak ditemukan')
+      throw new AuthorizationError('tidak dapat mengakses thread')
     }
 
     return result.rows[0].id
   }
 
-  async deleteById (id) {
+  async deleteById ({
+    id, userId
+  }) {
+    await this.getById(id)
+
     const query = {
-      text: 'DELETE FROM threads WHERE id = $1 RETURNING id',
-      values: [id]
+      text: 'DELETE FROM threads WHERE id = $1 AND owner = $2 RETURNING id',
+      values: [id, userId]
     }
     const result = await this._pool.query(query)
 
     if (result.rows.length !== 1) {
-      throw new InvariantError('thread tidak ditemukan')
+      throw new AuthorizationError('tidak dapat mengakses thread')
     }
 
     return result.rows[0].id

@@ -1,4 +1,7 @@
 const prefix = '/threads'
+const options = {
+  auth: 'forumapp_jwt'
+}
 
 const routes = (handler) => ([
   {
@@ -14,17 +17,20 @@ const routes = (handler) => ([
   {
     method: 'POST',
     path: prefix,
-    handler: handler.postHandler
+    handler: handler.postHandler,
+    options
   },
   {
     method: 'PUT',
     path: `${prefix}/{id}`,
-    handler: handler.putByIdHandler
+    handler: handler.putByIdHandler,
+    options
   },
   {
     method: 'DELETE',
     path: `${prefix}/{id}`,
-    handler: handler.deleteByIdHandler
+    handler: handler.deleteByIdHandler,
+    options
   }
 ])
 

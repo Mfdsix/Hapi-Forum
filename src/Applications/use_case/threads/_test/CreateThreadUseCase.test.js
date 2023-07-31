@@ -7,7 +7,8 @@ describe('CreateThreadUseCase', () => {
     // Arrange
     const useCasePayload = {
       title: 'test',
-      body: 'body of test'
+      body: 'body of test',
+      owner: 'owner-1'
     }
     const mockThreadRepository = new ThreadRepository()
 
