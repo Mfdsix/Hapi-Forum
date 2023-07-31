@@ -34,7 +34,7 @@ describe('a ReplyThreadComment entities', () => {
     }
 
     // Action and Assert
-    expect(() => new ReplyThreadComment(payload)).toThrowError('REPLY_THREAD_COMMENT.TITLE_LIMIT_CHAR')
+    expect(() => new ReplyThreadComment(payload)).toThrowError('REPLY_THREAD_COMMENT.CONTENT_LIMIT_CHAR')
   })
 
   it('should create ReplyThreadComment object correctly', () => {

@@ -19,7 +19,7 @@ class UpdateThreadComment {
     }
 
     if (content.length > 250) {
-      throw new Error('UPDATE_THREAD_COMMENT.TITLE_LIMIT_CHAR')
+      throw new Error('UPDATE_THREAD_COMMENT.CONTENT_LIMIT_CHAR')
     }
   }
 }

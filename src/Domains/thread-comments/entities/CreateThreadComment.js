@@ -19,7 +19,7 @@ class CreateThreadComment {
     }
 
     if (content.length > 250) {
-      throw new Error('CREATE_THREAD_COMMENT.TITLE_LIMIT_CHAR')
+      throw new Error('CREATE_THREAD_COMMENT.CONTENT_LIMIT_CHAR')
     }
   }
 }

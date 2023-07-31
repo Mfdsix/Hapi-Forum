@@ -32,7 +32,7 @@ describe('a CreateThreadComment entities', () => {
     }
 
     // Action and Assert
-    expect(() => new CreateThreadComment(payload)).toThrowError('CREATE_THREAD_COMMENT.TITLE_LIMIT_CHAR')
+    expect(() => new CreateThreadComment(payload)).toThrowError('CREATE_THREAD_COMMENT.CONTENT_LIMIT_CHAR')
   })
 
   it('should create CreateThreadComment object correctly', () => {

@@ -18,6 +18,7 @@ DomainErrorTranslator._directories = {
   'REFRESH_AUTHENTICATION_USE_CASE.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('refresh token harus string'),
   'DELETE_AUTHENTICATION_USE_CASE.NOT_CONTAIN_REFRESH_TOKEN': new InvariantError('harus mengirimkan token refresh'),
   'DELETE_AUTHENTICATION_USE_CASE.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('refresh token harus string'),
+
   // thread
   'CREATE_THREAD.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('tidak dapat membuat thread baru karena properti yang dibutuhkan tidak ada'),
   'CREATE_THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('tidak dapat membuat thread baru karena tipe data tidak sesuai'),
@@ -30,7 +31,23 @@ DomainErrorTranslator._directories = {
   'UPDATE_THREAD.TITLE_CONTAIN_RESTRICTED_CHARACTER': new InvariantError('tidak dapat mengupdate thread baru karena judul mengandung karakter terlarang'),
 
   'DELETE_THREAD.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('tidak dapat menghapus thread baru karena properti yang dibutuhkan tidak ada'),
-  'DELETE_THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('tidak dapat menghapus thread baru karena tipe data tidak sesuai')
+  'DELETE_THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('tidak dapat menghapus thread baru karena tipe data tidak sesuai'),
+
+  // thread comment
+  'CREATE_THREAD_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('tidak dapat membuat thread baru karena properti yang dibutuhkan tidak ada'),
+  'CREATE_THREAD_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('tidak dapat membuat thread baru karena tipe data tidak sesuai'),
+  'CREATE_THREAD_COMMENT.CONTENT_LIMIT_CHAR': new InvariantError('tidak dapat membuat thread baru karena karakter judul melebihi batas limit'),
+
+  'REPLY_THREAD_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('tidak dapat membuat thread baru karena properti yang dibutuhkan tidak ada'),
+  'REPLY_THREAD_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('tidak dapat membuat thread baru karena tipe data tidak sesuai'),
+  'REPLY_THREAD_COMMENT.CONTENT_LIMIT_CHAR': new InvariantError('tidak dapat membuat thread baru karena karakter judul melebihi batas limit'),
+
+  'UPDATE_THREAD_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('tidak dapat mengupdate thread baru karena properti yang dibutuhkan tidak ada'),
+  'UPDATE_THREAD_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('tidak dapat mengupdate thread baru karena tipe data tidak sesuai'),
+  'UPDATE_THREAD_COMMENT.CONTENT_LIMIT_CHAR': new InvariantError('tidak dapat mengupdate thread baru karena karakter judul melebihi batas limit'),
+
+  'DELETE_THREAD_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('tidak dapat menghapus thread baru karena properti yang dibutuhkan tidak ada'),
+  'DELETE_THREAD_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('tidak dapat menghapus thread baru karena tipe data tidak sesuai')
 }
 
 module.exports = DomainErrorTranslator
