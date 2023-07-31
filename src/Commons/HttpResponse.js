@@ -1,4 +1,4 @@
-class HttpResponse {
+const HttpResponse = {
   success ({
     data = undefined,
     message = undefined

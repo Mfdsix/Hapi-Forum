@@ -14,7 +14,7 @@ const UserRepositoryPostgres = require('./repository/UserRepositoryPostgres')
 const BcryptPasswordHash = require('./security/BcryptPasswordHash')
 
 const UserRepository = require('../Domains/users/UserRepository')
-const ThreadRepository = require('../Domains/authentications/AuthenticationRepository')
+const ThreadRepository = require('../Domains/threads/ThreadRepository')
 
 // use case
 const AddUserUseCase = require('../Applications/use_case/users/AddUserUseCase')
@@ -31,6 +31,8 @@ const GetByIdThreadUseCase = require('../Applications/use_case/threads/GetByIdTh
 const CreateThreadUseCase = require('../Applications/use_case/threads/CreateThreadUseCase')
 const UpdateByIdUseCase = require('../Applications/use_case/threads/UpdateByIdUseCase')
 const DeleteByIdUseCase = require('../Applications/use_case/threads/DeleteByIdUseCase')
+
+const ThreadRepositoryPostgres = require('./repository/ThreadRepositoryPostgres')
 
 // creating container
 const container = createContainer()
@@ -58,6 +60,20 @@ container.register([
       dependencies: [
         {
           concrete: pool
+        }
+      ]
+    }
+  },
+  {
+    key: ThreadRepository.name,
+    Class: ThreadRepositoryPostgres,
+    parameter: {
+      dependencies: [
+        {
+          concrete: pool
+        },
+        {
+          concrete: nanoid
         }
       ]
     }
