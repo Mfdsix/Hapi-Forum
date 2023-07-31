@@ -1,6 +1,5 @@
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper')
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError')
-const InvariantError = require('../../../Commons/exceptions/InvariantError')
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError')
 const CreateThread = require('../../../Domains/threads/entities/CreateThread')
 const CreatedThread = require('../../../Domains/threads/entities/CreatedThread')
@@ -137,7 +136,7 @@ describe('ThreadRepositoryPostgres', () => {
         id: 'thread-123',
         title: 'updated test',
         body: 'updated body of test',
-        userId: 'user-1'
+        userId: 'owner-1'
       }
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {})
 
@@ -189,7 +188,7 @@ describe('ThreadRepositoryPostgres', () => {
       // Action
       const deleted = await threadRepositoryPostgres.deleteById({
         id: 'thread-123',
-        userId: 'user-1'
+        userId: 'owner-1'
       })
       const getOne = threadRepositoryPostgres.getById('thread-123')
 

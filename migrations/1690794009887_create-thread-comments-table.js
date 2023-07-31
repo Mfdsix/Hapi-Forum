@@ -8,6 +8,10 @@ exports.up = pgm => {
       type: 'TEXT',
       notNull: true
     },
+    thread: {
+      type: 'VARCHAR(50)',
+      notNull: false
+    },
     parent: {
       type: 'VARCHAR(50)',
       notNull: false
