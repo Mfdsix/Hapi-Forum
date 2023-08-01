@@ -12,7 +12,7 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
 
   async getByThreadId (threadId) {
     const query = {
-      text: `SELECT c.id, c.content, c.created_at, c.deleted_at, u.username
+      text: `SELECT c.id, c.content, c.parent, c.created_at, c.deleted_at, u.username
       FROM thread_comments c
       LEFT JOIN users u ON u.id = c.owner
       WHERE c.thread = $1 AND c.parent IS NULL
@@ -26,7 +26,7 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
 
   async getReplyByCommentId (commentId) {
     const query = {
-      text: `SELECT c.id, c.content, c.created_at, c.deleted_at, u.username
+      text: `SELECT c.id, c.content, c.parent, c.created_at, c.deleted_at, u.username
       FROM thread_comments c
       LEFT JOIN users u ON u.id = c.owner
       WHERE c.parent = $1
@@ -40,7 +40,7 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
 
   async getById (id) {
     const query = {
-      text: `SELECT c.id, c.content, c.created_at, u.username
+      text: `SELECT c.id, c.content, c.parent, c.created_at, c.deleted_at, u.username
       FROM thread_comments c
       LEFT JOIN users u ON u.id = c.owner
       WHERE c.id = $1`,
@@ -72,7 +72,7 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
   }
 
   async reply (payload) {
-    const { id: parentId, threadId, content, owner } = payload
+    const { parentId, threadId, content, owner } = payload
     const id = `comment-${this._idGenerator()}`
     const createdAt = new Date().toISOString()
 
@@ -110,9 +110,11 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
   }) {
     await this.getById(id)
 
+    const deletedAt = new Date().toISOString()
+
     const query = {
-      text: 'DELETE FROM thread_comments WHERE id = $1 AND owner = $2 RETURNING id',
-      values: [id, userId]
+      text: 'UPDATE thread_comments SET deleted_at = $1 WHERE id = $2 AND owner = $3 RETURNING id',
+      values: [deletedAt, id, userId]
     }
     const result = await this._pool.query(query)
 
@@ -124,9 +126,18 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
   }
 
   _transformData (data) {
+    let content = data.content
+    if (data.deleted_at) {
+      if (data.parent) {
+        content = '**balasan telah dihapus**'
+      } else {
+        content = '**komentar telah dihapus**'
+      }
+    }
+
     return {
       id: data.id,
-      content: data.deleted_at ? '**komentar telah dihapus**' : data.content,
+      content,
       username: data.username,
       date: data.created_at
     }

@@ -248,11 +248,12 @@ describe('ThreadCommentRepositoryPostgres', () => {
         id: 'comment-1',
         userId: 'user-1'
       })
-      const getOne = threadCommentRepositoryPostgres.getById('comment-1')
+      const getOne = await threadCommentRepositoryPostgres.getById('comment-1')
 
       // Assert
       expect(deleted).toEqual('comment-1')
-      await expect(getOne).rejects.toThrow(new NotFoundError('komentar tidak ditemukan'))
+      expect(getOne.id).toEqual('comment-1')
+      expect(getOne.content).toEqual('**komentar telah dihapus**')
     })
   })
 })
