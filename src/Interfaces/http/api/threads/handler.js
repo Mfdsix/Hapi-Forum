@@ -43,7 +43,7 @@ class ThreadsHandler {
     const { id: credentialId } = request.auth.credentials
     const useCase = this._container.getInstance(CreateThreadUseCase.name)
 
-    const thread = await useCase.execute({
+    const addedThread = await useCase.execute({
       title,
       body,
       owner: credentialId
@@ -51,7 +51,9 @@ class ThreadsHandler {
 
     const response = h.response(HttpResponse.success({
       message: 'thread berhasil dibuat',
-      data: thread.id
+      data: {
+        addedThread
+      }
     }))
     response.code(201)
 

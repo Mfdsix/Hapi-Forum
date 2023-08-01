@@ -10,36 +10,40 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
     this._idGenerator = idGenerator
   }
 
-  async getByThreadId (threadId, includeReplies = true) {
+  async getByThreadId (threadId) {
     const query = {
-      text: 'SELECT id, content, owner FROM thread_comments WHERE thread = $1 AND parent IS NULL',
+      text: `SELECT c.id, c.content, c.created_at, c.deleted_at, u.username
+      FROM thread_comments c
+      LEFT JOIN users u ON u.id = c.owner
+      WHERE c.thread = $1 AND c.parent IS NULL
+      ORDER BY c.created_at ASC`,
       values: [threadId]
     }
     const result = await this._pool.query(query)
 
-    if (result.rows.length > 0 && includeReplies) {
-      for (let i = 0; i < result.rows.length; i++) {
-        const replies = await this.getReplyByCommentId(result.rows[i].id)
-        result.rows[i].replies = replies
-      }
-    }
-
-    return result.rows
+    return result.rows.map(this._transformData)
   }
 
   async getReplyByCommentId (commentId) {
     const query = {
-      text: 'SELECT id, content, owner FROM thread_comments WHERE parent = $1',
+      text: `SELECT c.id, c.content, c.created_at, c.deleted_at, u.username
+      FROM thread_comments c
+      LEFT JOIN users u ON u.id = c.owner
+      WHERE c.parent = $1
+      ORDER BY c.created_at ASC`,
       values: [commentId]
     }
     const result = await this._pool.query(query)
 
-    return result.rows
+    return result.rows.map(this._transformData)
   }
 
   async getById (id) {
     const query = {
-      text: 'SELECT * FROM thread_comments WHERE id = $1',
+      text: `SELECT c.id, c.content, c.created_at, u.username
+      FROM thread_comments c
+      LEFT JOIN users u ON u.id = c.owner
+      WHERE c.id = $1`,
       values: [id]
     }
     const result = await this._pool.query(query)
@@ -48,7 +52,7 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
       throw new NotFoundError('komentar tidak ditemukan')
     }
 
-    return result.rows[0]
+    return this._transformData(result.rows[0])
   }
 
   async create (payload) {
@@ -117,6 +121,15 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
     }
 
     return result.rows[0].id
+  }
+
+  _transformData (data) {
+    return {
+      id: data.id,
+      content: data.deleted_at ? '**komentar telah dihapus**' : data.content,
+      username: data.username,
+      date: data.created_at
+    }
   }
 }
 

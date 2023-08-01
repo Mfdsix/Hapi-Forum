@@ -7,7 +7,7 @@ const pool = require('../../database/postgres/pool')
 const ThreadRepositoryPostgres = require('../ThreadRepositoryPostgres')
 
 describe('ThreadRepositoryPostgres', () => {
-  afterEach(async () => {
+  beforeEach(async () => {
     await ThreadsTableTestHelper.cleanTable()
   })
 
@@ -64,7 +64,9 @@ describe('ThreadRepositoryPostgres', () => {
 
       expect(thread).toHaveProperty('id')
       expect(thread).toHaveProperty('title')
-      expect(thread).toHaveProperty('owner')
+      expect(thread).toHaveProperty('body')
+      expect(thread).toHaveProperty('username')
+      expect(thread).toHaveProperty('date')
       expect(thread.id).toEqual('thread-123')
     })
   })

@@ -19,7 +19,11 @@ class ThreadRepositoryPostgres extends ThreadRepository {
 
   async getById (id) {
     const query = {
-      text: 'SELECT * FROM threads WHERE id = $1',
+      text: `SELECT
+      t.id, t.title, t.body, t.created_at, u.username
+      FROM threads t
+      LEFT JOIN users u ON u.id = t.owner
+      WHERE t.id = $1`,
       values: [id]
     }
     const result = await this._pool.query(query)
@@ -28,7 +32,7 @@ class ThreadRepositoryPostgres extends ThreadRepository {
       throw new NotFoundError('thread tidak ditemukan')
     }
 
-    return result.rows[0]
+    return this._transformData(result.rows[0])
   }
 
   async create (payload) {
@@ -80,6 +84,16 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     }
 
     return result.rows[0].id
+  }
+
+  _transformData (data) {
+    return {
+      id: data.id,
+      title: data.title,
+      body: data.body,
+      username: data.username,
+      date: data.created_at
+    }
   }
 }
 
