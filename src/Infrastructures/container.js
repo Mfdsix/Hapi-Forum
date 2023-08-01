@@ -10,11 +10,15 @@ const pool = require('./database/postgres/pool')
 
 // service (repository, helper, manager, etc)
 const PasswordHash = require('../Applications/security/PasswordHash')
-const UserRepositoryPostgres = require('./repository/UserRepositoryPostgres')
 const BcryptPasswordHash = require('./security/BcryptPasswordHash')
+
+const UserRepositoryPostgres = require('./repository/UserRepositoryPostgres')
+const ThreadRepositoryPostgres = require('./repository/ThreadRepositoryPostgres')
+const ThreadCommentRepositoryPostgres = require('./repository/ThreadCommentRepositoryPostgres')
 
 const UserRepository = require('../Domains/users/UserRepository')
 const ThreadRepository = require('../Domains/threads/ThreadRepository')
+const ThreadCommentRepository = require('../Domains/thread-comments/ThreadCommentRepository')
 
 // use case
 const AddUserUseCase = require('../Applications/use_case/users/AddUserUseCase')
@@ -32,7 +36,10 @@ const CreateThreadUseCase = require('../Applications/use_case/threads/CreateThre
 const UpdateThreadByIdUseCase = require('../Applications/use_case/threads/UpdateThreadByIdUseCase')
 const DeleteThreadByIdUseCase = require('../Applications/use_case/threads/DeleteThreadByIdUseCase')
 
-const ThreadRepositoryPostgres = require('./repository/ThreadRepositoryPostgres')
+const CreateThreadCommentUseCase = require('../Applications/use_case/thread-comments/CreateThreadCommentUseCase')
+const ReplyThreadCommentUseCase = require('../Applications/use_case/thread-comments/ReplyThreadCommentUseCase')
+const UpdateThreadCommentUseCase = require('../Applications/use_case/thread-comments/UpdateThreadCommentUseCase')
+const DeleteThreadCommentUseCase = require('../Applications/use_case/thread-comments/DeleteThreadCommentUseCase')
 
 // creating container
 const container = createContainer()
@@ -67,6 +74,20 @@ container.register([
   {
     key: ThreadRepository.name,
     Class: ThreadRepositoryPostgres,
+    parameter: {
+      dependencies: [
+        {
+          concrete: pool
+        },
+        {
+          concrete: nanoid
+        }
+      ]
+    }
+  },
+  {
+    key: ThreadCommentRepository.name,
+    Class: ThreadCommentRepositoryPostgres,
     parameter: {
       dependencies: [
         {
@@ -238,6 +259,74 @@ container.register([
         {
           name: 'threadRepository',
           internal: ThreadRepository.name
+        }
+      ]
+    }
+  },
+  {
+    key: CreateThreadCommentUseCase.name,
+    Class: CreateThreadCommentUseCase,
+    parameter: {
+      injectType: 'destructuring',
+      dependencies: [
+        {
+          name: 'threadRepository',
+          internal: ThreadRepository.name
+        },
+        {
+          name: 'threadCommentRepository',
+          internal: ThreadCommentRepository.name
+        }
+      ]
+    }
+  },
+  {
+    key: ReplyThreadCommentUseCase.name,
+    Class: ReplyThreadCommentUseCase,
+    parameter: {
+      injectType: 'destructuring',
+      dependencies: [
+        {
+          name: 'threadRepository',
+          internal: ThreadRepository.name
+        },
+        {
+          name: 'threadCommentRepository',
+          internal: ThreadCommentRepository.name
+        }
+      ]
+    }
+  },
+  {
+    key: UpdateThreadCommentUseCase.name,
+    Class: UpdateThreadCommentUseCase,
+    parameter: {
+      injectType: 'destructuring',
+      dependencies: [
+        {
+          name: 'threadRepository',
+          internal: ThreadRepository.name
+        },
+        {
+          name: 'threadCommentRepository',
+          internal: ThreadCommentRepository.name
+        }
+      ]
+    }
+  },
+  {
+    key: DeleteThreadCommentUseCase.name,
+    Class: DeleteThreadCommentUseCase,
+    parameter: {
+      injectType: 'destructuring',
+      dependencies: [
+        {
+          name: 'threadRepository',
+          internal: ThreadRepository.name
+        },
+        {
+          name: 'threadCommentRepository',
+          internal: ThreadCommentRepository.name
         }
       ]
     }

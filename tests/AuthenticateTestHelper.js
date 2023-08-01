@@ -6,7 +6,7 @@ const AuthenticateTestHelper = {
     const server = await createServer(container)
 
     // add user
-    await server.inject({
+    const register = await server.inject({
       method: 'POST',
       url: '/users',
       payload: {
@@ -16,7 +16,7 @@ const AuthenticateTestHelper = {
       }
     })
     // login user
-    const loginResponse = await server.inject({
+    const login = await server.inject({
       method: 'POST',
       url: '/authentications',
       payload: {
@@ -24,7 +24,14 @@ const AuthenticateTestHelper = {
         password: 'user123'
       }
     })
-    return JSON.parse(loginResponse.payload).data
+
+    const registerResponse = JSON.parse(register.payload).data
+    const loginResponse = JSON.parse(login.payload).data
+
+    return {
+      userId: registerResponse.addedUser.id,
+      ...loginResponse
+    }
   }
 }
 

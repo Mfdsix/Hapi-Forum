@@ -7,6 +7,7 @@ const DomainErrorTranslator = require('../../Commons/exceptions/DomainErrorTrans
 const users = require('../../Interfaces/http/api/users')
 const authentications = require('../../Interfaces/http/api/authentications')
 const threads = require('../../Interfaces/http/api/threads')
+const threadComments = require('../../Interfaces/http/api/thread-comments')
 
 const createServer = async (container) => {
   const server = Hapi.server({
@@ -47,6 +48,10 @@ const createServer = async (container) => {
     {
       plugin: threads,
       options: { container }
+    },
+    {
+      plugin: threadComments,
+      options: { container }
     }
   ])
 
@@ -74,6 +79,8 @@ const createServer = async (container) => {
       }
 
       // penanganan server error sesuai kebutuhan
+      // eslint-disable-next-line no-console
+      console.log(response.message)
       const newResponse = h.response({
         status: 'error',
         message: 'terjadi kegagalan pada server kami'

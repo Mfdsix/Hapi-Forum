@@ -75,7 +75,7 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
     const query = {
       text: `INSERT INTO thread_comments 
       (id, thread, content, owner, created_at, parent)
-      VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, title, owner`,
+      VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, content, owner`,
       values: [id, threadId, content, owner, createdAt, parentId]
     }
     const result = await this._pool.query(query)

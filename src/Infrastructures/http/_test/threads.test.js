@@ -10,8 +10,11 @@ describe('/threads endpoint', () => {
     await pool.end()
   })
 
-  afterEach(async () => {
+  beforeEach(async () => {
     await ThreadsTableTestHelper.cleanTable()
+  })
+
+  afterEach(async () => {
     await UsersTableTestHelper.cleanTable()
   })
 
