@@ -4,6 +4,7 @@ const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper')
 const AuthenticateTestHelper = require('../../../../tests/AuthenticateTestHelper')
 const container = require('../../container')
 const createServer = require('../createServer')
+const { headers } = require('@hapi/hapi/lib/cors')
 
 describe('/threads endpoint', () => {
   afterAll(async () => {
@@ -231,6 +232,134 @@ describe('/threads endpoint', () => {
       const responseJson = JSON.parse(response.payload)
       expect(response.statusCode).toEqual(404)
       expect(responseJson.status).toEqual('fail')
+    })
+
+    it('should response 403 when not owner', async () => {
+      const payload = {
+        title: 'title',
+        body: 'body of title'
+      }
+      const server = await createServer(container)
+      const { accessToken } = await AuthenticateTestHelper.createUserAndLogin()
+
+      // Action
+      const threadId = await ThreadsTableTestHelper.seed()
+      const response = await server.inject({
+        method: 'PUT',
+        url: `/threads/${threadId}`,
+        headers: {
+          Authorization: 'Bearer ' + accessToken
+        },
+        payload
+      })
+
+      // Assert
+      const responseJson = JSON.parse(response.payload)
+      expect(response.statusCode).toEqual(403)
+      expect(responseJson.status).toEqual('fail')
+    })
+
+    it('should response 200 when not owner', async () => {
+      const payload = {
+        title: 'title',
+        body: 'body of title'
+      }
+      const server = await createServer(container)
+      const { accessToken, userId } = await AuthenticateTestHelper.createUserAndLogin()
+
+      // Action
+      const threadId = await ThreadsTableTestHelper.seed(userId)
+      const response = await server.inject({
+        method: 'PUT',
+        url: `/threads/${threadId}`,
+        headers: {
+          Authorization: 'Bearer ' + accessToken
+        },
+        payload
+      })
+
+      // Assert
+      const responseJson = JSON.parse(response.payload)
+      expect(response.statusCode).toEqual(200)
+      expect(responseJson.status).toEqual('success')
+    })
+  })
+
+  describe('when DELETE /threads/{id}', () => {
+    it('should response 401 when not login', async () => {
+      const threadId = 'thread-1'
+      const server = await createServer(container)
+
+      // Action
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${threadId}`
+      })
+
+      // Assert
+      const responseJson = JSON.parse(response.payload)
+      expect(response.statusCode).toEqual(401)
+      expect(responseJson.error).toEqual('Unauthorized')
+    })
+
+    it('should response 404 when not no data', async () => {
+      const server = await createServer(container)
+      const { accessToken } = await AuthenticateTestHelper.createUserAndLogin()
+      const threadId = 'thread-1'
+
+      // Action
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${threadId}`,
+        headers: {
+          Authorization: 'Bearer ' + accessToken
+        }
+      })
+
+      // Assert
+      const responseJson = JSON.parse(response.payload)
+      expect(response.statusCode).toEqual(404)
+      expect(responseJson.status).toEqual('fail')
+    })
+
+    it('should response 403 when not owner', async () => {
+      const server = await createServer(container)
+      const { accessToken } = await AuthenticateTestHelper.createUserAndLogin()
+
+      // Action
+      const threadId = await ThreadsTableTestHelper.seed()
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${threadId}`,
+        headers: {
+          Authorization: 'Bearer ' + accessToken
+        }
+      })
+
+      // Assert
+      const responseJson = JSON.parse(response.payload)
+      expect(response.statusCode).toEqual(403)
+      expect(responseJson.status).toEqual('fail')
+    })
+
+    it('should response 200 when not owner', async () => {
+      const server = await createServer(container)
+      const { accessToken, userId } = await AuthenticateTestHelper.createUserAndLogin()
+
+      // Action
+      const threadId = await ThreadsTableTestHelper.seed(userId)
+      const response = await server.inject({
+        method: 'DELETE',
+        url: `/threads/${threadId}`,
+        headers: {
+          Authorization: 'Bearer ' + accessToken
+        }
+      })
+
+      // Assert
+      const responseJson = JSON.parse(response.payload)
+      expect(response.statusCode).toEqual(200)
+      expect(responseJson.status).toEqual('success')
     })
   })
 })
