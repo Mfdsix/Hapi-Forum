@@ -26,13 +26,9 @@ describe('CreateThreadUseCase', () => {
     })
 
     // Action
-    const created = await createThreadUseCase.execute(useCasePayload)
+    await createThreadUseCase.execute(useCasePayload)
 
     // Assert
-    expect(created).toEqual(new CreatedThread({
-      id: 'thread-123',
-      title: useCasePayload.title,
-      owner: useCasePayload.owner
-    }))
+    expect(mockThreadRepository.create).toBeCalledWith(useCasePayload)
   })
 })

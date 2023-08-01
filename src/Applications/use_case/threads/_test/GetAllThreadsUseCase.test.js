@@ -41,6 +41,7 @@ describe('GetAllThreadsUseCase', () => {
     const threads = await getAllThreadsUseCase.execute()
 
     // Assert
+    expect(mockThreadRepository.getAll).toBeCalled()
     expect(threads).toStrictEqual(mockAddedThreads)
     expect(threads.length).toEqual(mockAddedThreads.length)
     expect(threads[0].id).toEqual(mockAddedThreads[0].id)

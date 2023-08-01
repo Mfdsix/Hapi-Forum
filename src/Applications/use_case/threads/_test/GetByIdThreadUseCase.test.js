@@ -62,6 +62,9 @@ describe('GetByIdThreadUseCase', () => {
     const thread3 = await getByIdThreadUseCase.execute(mockAddedThreads[2].id)
 
     // Assert
+    expect(mockThreadRepository.getById).toBeCalledTimes(mockAddedThreads.length)
+    expect(mockThreadCommentRepository.getByThreadId).toBeCalledTimes(mockAddedThreads.length)
+    expect(mockThreadCommentRepository.getReplyByCommentId).toBeCalledTimes(mockAddedThreads.length)
     expect(thread1.id).toStrictEqual(mockAddedThreads[0].id)
     expect(thread2.id).toStrictEqual(mockAddedThreads[1].id)
     expect(thread3.id).toStrictEqual(mockAddedThreads[2].id)

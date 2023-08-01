@@ -27,6 +27,7 @@ describe('UpdateByIdThreadUseCase', () => {
     const updated = await updateByIdThreadUseCase.execute(useCasePayload)
 
     // Assert
+    expect(mockThreadRepository.updateById).toBeCalledWith(useCasePayload)
     expect(updated).toEqual({
       id: useCasePayload.id
     })

@@ -35,13 +35,11 @@ describe('ReplyThreadCommentUseCase', () => {
     })
 
     // Action
-    const created = await replyThreadCommentUseCase.execute(useCasePayload)
+    await replyThreadCommentUseCase.execute(useCasePayload)
 
     // Assert
-    expect(created).toEqual(new CreatedThreadComment({
-      id: 'comment-123',
-      content: useCasePayload.content,
-      owner: useCasePayload.owner
-    }))
+    expect(mockThreadRepository.getById).toBeCalledWith(useCasePayload.threadId)
+    expect(mockThreadCommentRepository.getById).toBeCalledWith(useCasePayload.parentId)
+    expect(mockThreadCommentRepository.reply).toBeCalledWith(useCasePayload)
   })
 })

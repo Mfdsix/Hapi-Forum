@@ -12,7 +12,7 @@ describe('DeleteByIdThreadUseCase', () => {
 
     // Mocking
     mockThreadRepository.deleteById = jest.fn()
-      .mockImplementation(({ id, userId }) => Promise.resolve({
+      .mockImplementation(({ id }) => Promise.resolve({
         id
       }))
 
@@ -25,6 +25,7 @@ describe('DeleteByIdThreadUseCase', () => {
     const deleted = await deleteByIdThreadUseCase.execute(useCasePayload)
 
     // Assert
+    expect(mockThreadRepository.deleteById).toBeCalledWith(useCasePayload)
     expect(deleted).toEqual({
       id: useCasePayload.id
     })
