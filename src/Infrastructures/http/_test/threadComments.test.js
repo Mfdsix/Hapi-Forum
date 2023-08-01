@@ -232,7 +232,6 @@ describe('/threads/{threadId}/comments endpoint', () => {
 
       // Action
       const commentId = await ThreadCommentsTableTestHelper.seed(userId)
-      console.log(userId, commentId)
       const response = await server.inject({
         method: 'DELETE',
         url: `/threads/${threadId}/comments/${commentId}`,

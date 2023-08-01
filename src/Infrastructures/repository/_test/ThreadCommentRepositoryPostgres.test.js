@@ -7,8 +7,6 @@ const NotFoundError = require('../../../Commons/exceptions/NotFoundError')
 const CreateThreadComment = require('../../../Domains/thread-comments/entities/CreateThreadComment')
 const CreatedThreadComment = require('../../../Domains/thread-comments/entities/CreatedThreadComment')
 const ReplyThreadComment = require('../../../Domains/thread-comments/entities/ReplyThreadComment')
-const UpdateThreadComment = require('../../../Domains/thread-comments/entities/UpdateThreadComment')
-const DeleteThreadComment = require('../../../Domains/thread-comments/entities/DeleteThreadComment')
 
 const pool = require('../../database/postgres/pool')
 

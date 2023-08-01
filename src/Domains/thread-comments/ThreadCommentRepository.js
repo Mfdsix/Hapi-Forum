@@ -1,4 +1,4 @@
-class ThreadCoomentRepository {
+class ThreadCommentRepository {
   async getByThreadId (threadId) {
     throw new Error('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED')
   }
@@ -28,4 +28,4 @@ class ThreadCoomentRepository {
   }
 }
 
-module.exports = ThreadCoomentRepository
+module.exports = ThreadCommentRepository

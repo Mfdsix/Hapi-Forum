@@ -220,6 +220,10 @@ container.register([
         {
           name: 'threadRepository',
           internal: ThreadRepository.name
+        },
+        {
+          name: 'threadCommentRepository',
+          internal: ThreadCommentRepository.name
         }
       ]
     }
