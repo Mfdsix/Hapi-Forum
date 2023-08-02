@@ -30,10 +30,10 @@ describe('a DeleteThread entities', () => {
     }
 
     // Action
-    const { title, body } = new DeleteThread(payload)
+    const { id, userId } = new DeleteThread(payload)
 
     // Assert
-    expect(title).toEqual(payload.title)
-    expect(body).toEqual(payload.body)
+    expect(id).toEqual(payload.id)
+    expect(userId).toEqual(payload.userId)
   })
 })
