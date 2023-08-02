@@ -72,10 +72,11 @@ describe('a CreateThread entities', () => {
     }
 
     // Action
-    const { title, body } = new CreateThread(payload)
+    const { title, body, owner } = new CreateThread(payload)
 
     // Assert
     expect(title).toEqual(payload.title)
     expect(body).toEqual(payload.body)
+    expect(owner).toEqual(payload.owner)
   })
 })
