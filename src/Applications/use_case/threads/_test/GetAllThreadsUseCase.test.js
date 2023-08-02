@@ -30,7 +30,23 @@ describe('GetAllThreadsUseCase', () => {
 
     /** mocking needed function */
     mockThreadRepository.getAll = jest.fn()
-      .mockImplementation(() => Promise.resolve(mockAddedThreads))
+      .mockImplementation(() => Promise.resolve([
+        {
+          id: 'thread-1',
+          title: 'Thread 1',
+          owner: 'owner1'
+        },
+        {
+          id: 'thread-2',
+          title: 'Thread 2',
+          owner: 'owner2'
+        },
+        {
+          id: 'thread-3',
+          title: 'Thread 3',
+          owner: 'owner3'
+        }
+      ]))
 
     // create use case instance
     const getAllThreadsUseCase = new GetAllThreadsUseCase({
