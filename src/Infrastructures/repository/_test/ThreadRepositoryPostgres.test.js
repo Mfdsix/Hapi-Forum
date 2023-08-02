@@ -29,7 +29,7 @@ describe('ThreadRepositoryPostgres', () => {
 
     it('should throw data when found', async () => {
       // Arrange
-      await ThreadsTableTestHelper.seed({ id: 'thread-123' })
+      await ThreadsTableTestHelper.seed()
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {})
 
       // Action & Assert
@@ -40,6 +40,9 @@ describe('ThreadRepositoryPostgres', () => {
       expect(threads[0]).toHaveProperty('title')
       expect(threads[0]).toHaveProperty('owner')
       expect(threads[0].id).toEqual('thread-123')
+      expect(threads[0].title).toEqual('test')
+      expect(threads[0].body).toEqual('body of test')
+      expect(threads[0].owner).toEqual('owner-1')
     })
   })
 
@@ -56,7 +59,7 @@ describe('ThreadRepositoryPostgres', () => {
 
     it('should throw data when found', async () => {
       // Arrange
-      await ThreadsTableTestHelper.seed({ id: 'thread-123' })
+      await ThreadsTableTestHelper.seed()
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {})
 
       // Action & Assert
@@ -68,6 +71,8 @@ describe('ThreadRepositoryPostgres', () => {
       expect(thread).toHaveProperty('username')
       expect(thread).toHaveProperty('date')
       expect(thread.id).toEqual('thread-123')
+      expect(thread.title).toEqual('test')
+      expect(thread.body).toEqual('body of test')
     })
   })
 
@@ -95,6 +100,8 @@ describe('ThreadRepositoryPostgres', () => {
       expect(created).toHaveProperty('title')
       expect(created).toHaveProperty('owner')
       expect(created.id).toEqual('thread-123')
+      expect(created.title).toEqual(createThread.title)
+      expect(created.owner).toEqual(createThread.owner)
     })
   })
 
