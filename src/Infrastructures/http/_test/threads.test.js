@@ -210,7 +210,7 @@ describe('/threads endpoint', () => {
       expect(responseJson.status).toEqual('fail')
     })
 
-    it('should response 404 when not no data', async () => {
+    it('should response 404 when no data', async () => {
       const payload = {
         title: 'title',
         body: 'body of title'

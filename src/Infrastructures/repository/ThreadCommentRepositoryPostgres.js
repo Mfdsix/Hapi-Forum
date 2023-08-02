@@ -21,7 +21,7 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
     }
     const result = await this._pool.query(query)
 
-    return result.rows.map(this._transformData)
+    return result.rows
   }
 
   async getReplyByCommentId (commentId) {

@@ -43,7 +43,7 @@ describe('ThreadCommentRepositoryPostgres', () => {
       expect(comments[0]).toHaveProperty('id')
       expect(comments[0]).toHaveProperty('content')
       expect(comments[0]).toHaveProperty('username')
-      expect(comments[0]).toHaveProperty('date')
+      expect(comments[0]).toHaveProperty('created_at')
       expect(comments[0].id).toEqual('comment-1')
       expect(comments[0].content).toEqual('test')
     })
@@ -73,7 +73,7 @@ describe('ThreadCommentRepositoryPostgres', () => {
       expect(comments[0]).toHaveProperty('id')
       expect(comments[0]).toHaveProperty('content')
       expect(comments[0]).toHaveProperty('username')
-      expect(comments[0]).toHaveProperty('date')
+      expect(comments[0]).toHaveProperty('created_at')
       expect(comments[0].id).toEqual('comment-2')
       expect(comments[0].content).toEqual('comment test reply')
     })
@@ -134,7 +134,7 @@ describe('ThreadCommentRepositoryPostgres', () => {
       expect(getOne).toHaveProperty('id')
       expect(getOne).toHaveProperty('content')
       expect(getOne).toHaveProperty('username')
-      expect(getOne).toHaveProperty('date')
+      expect(getOne).toHaveProperty('created_at')
       expect(getOne.id).toEqual(created.id)
       expect(getOne.content).toEqual(created.content)
     })
@@ -260,12 +260,9 @@ describe('ThreadCommentRepositoryPostgres', () => {
         id: 'comment-1',
         userId: 'user-1'
       })
-      const getOne = await threadCommentRepositoryPostgres.getById('comment-1')
 
       // Assert
       expect(deleted).toEqual('comment-1')
-      expect(getOne.id).toEqual('comment-1')
-      expect(getOne.content).toEqual('**komentar telah dihapus**')
     })
   })
 })

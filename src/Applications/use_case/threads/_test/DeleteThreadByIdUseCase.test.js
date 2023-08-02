@@ -11,6 +11,8 @@ describe('DeleteByIdThreadUseCase', () => {
     const mockThreadRepository = new ThreadRepository()
 
     // Mocking
+    mockThreadRepository.checkAvailability = jest.fn()
+      .mockImplementation((payload) => Promise.resolve())
     mockThreadRepository.deleteById = jest.fn()
       .mockImplementation(({ id }) => Promise.resolve({
         id

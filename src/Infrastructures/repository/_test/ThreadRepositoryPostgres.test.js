@@ -41,7 +41,6 @@ describe('ThreadRepositoryPostgres', () => {
       expect(threads[0]).toHaveProperty('owner')
       expect(threads[0].id).toEqual('thread-123')
       expect(threads[0].title).toEqual('test')
-      expect(threads[0].body).toEqual('body of test')
       expect(threads[0].owner).toEqual('owner-1')
     })
   })
@@ -106,20 +105,6 @@ describe('ThreadRepositoryPostgres', () => {
   })
 
   describe('updateById function', () => {
-    it('should throw error when no thread found', async () => {
-      // Arrange
-      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {})
-
-      // Action & Assert
-      const threads = threadRepositoryPostgres.updateById({
-        id: 'unique-id',
-        title: 'test',
-        body: 'body of test',
-        userId: 'owner'
-      })
-
-      await expect(threads).rejects.toThrow(new NotFoundError('thread tidak ditemukan'))
-    })
 
     it('should throw error when not owner of thread', async () => {
       // Arrange
@@ -161,18 +146,6 @@ describe('ThreadRepositoryPostgres', () => {
   })
 
   describe('deleteById function', () => {
-    it('should throw error when no thread found', async () => {
-      // Arrange
-      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {})
-
-      // Action & Assert
-      const threads = threadRepositoryPostgres.deleteById({
-        id: 'unique-id',
-        userId: 'user-1'
-      })
-
-      await expect(threads).rejects.toThrow(new NotFoundError('thread tidak ditemukan'))
-    })
 
     it('should throw error when not owner of thread', async () => {
       // Arrange

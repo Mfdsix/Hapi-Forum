@@ -13,6 +13,8 @@ describe('UpdateByIdThreadUseCase', () => {
     const mockThreadRepository = new ThreadRepository()
 
     // Mocking
+    mockThreadRepository.checkAvailability = jest.fn()
+      .mockImplementation((payload) => Promise.resolve())
     mockThreadRepository.updateById = jest.fn()
       .mockImplementation((payload) => Promise.resolve({
         id: payload.id
