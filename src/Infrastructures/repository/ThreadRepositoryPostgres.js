@@ -86,6 +86,10 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     return result.rows[0].id
   }
 
+  async checkAvailability (id) {
+    return this.getById(id)
+  }
+
   _transformData (data) {
     return {
       id: data.id,

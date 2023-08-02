@@ -17,7 +17,7 @@ describe('CreateThreadCommentUseCase', () => {
     const mockThreadCommentRepository = new ThreadCommentRepository()
 
     // Mocking
-    mockThreadRepository.getById = jest.fn()
+    mockThreadRepository.checkAvailability = jest.fn()
       .mockImplementation((payload) => Promise.resolve(payload))
     mockThreadCommentRepository.create = jest.fn()
       .mockImplementation((payload) => Promise.resolve({
@@ -36,7 +36,7 @@ describe('CreateThreadCommentUseCase', () => {
     await createThreadCommentUseCase.execute(useCasePayload)
 
     // Assert
-    expect(mockThreadRepository.getById).toBeCalledWith(useCasePayload.threadId)
+    expect(mockThreadRepository.checkAvailability).toBeCalledWith(useCasePayload.threadId)
     expect(mockThreadCommentRepository.create).toBeCalledWith(useCasePayload)
   })
 })

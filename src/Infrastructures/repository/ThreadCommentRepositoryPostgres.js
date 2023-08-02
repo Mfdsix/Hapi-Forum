@@ -125,6 +125,10 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
     return result.rows[0].id
   }
 
+  async checkAvailability (commentId) {
+    return this.getById(commentId)
+  }
+
   _transformData (data) {
     let content = data.content
     if (data.deleted_at) {

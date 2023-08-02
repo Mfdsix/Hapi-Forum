@@ -9,6 +9,7 @@ describe('ThreadCommentRepository interface', () => {
     await expect(threadCommentRepository.getByThreadId('thread-123')).rejects.toThrowError('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED')
     await expect(threadCommentRepository.getReplyByCommentId('comment-123')).rejects.toThrowError('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED')
     await expect(threadCommentRepository.getById('comment-123')).rejects.toThrowError('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED')
+    await expect(threadCommentRepository.checkAvailability('comment-123')).rejects.toThrowError('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED')
     await expect(threadCommentRepository.create({})).rejects.toThrowError('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED')
     await expect(threadCommentRepository.reply({})).rejects.toThrowError('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED')
     await expect(threadCommentRepository.updateById({})).rejects.toThrowError('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED')

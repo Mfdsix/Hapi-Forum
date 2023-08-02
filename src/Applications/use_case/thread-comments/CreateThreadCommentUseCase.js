@@ -9,7 +9,7 @@ class CreateThreadCommentUseCase {
   async execute (useCasePayload) {
     const payload = new CreateThreadComment(useCasePayload)
 
-    await this._threadRepository.getById(payload.threadId)
+    await this._threadRepository.checkAvailability(payload.threadId)
     return this._threadCommentRepository.create(payload)
   }
 }

@@ -17,9 +17,9 @@ describe('ReplyThreadCommentUseCase', () => {
     const mockThreadCommentRepository = new ThreadCommentRepository()
 
     // Mocking
-    mockThreadRepository.getById = jest.fn()
+    mockThreadRepository.checkAvailability = jest.fn()
       .mockImplementation((payload) => Promise.resolve(payload))
-    mockThreadCommentRepository.getById = jest.fn()
+    mockThreadCommentRepository.checkAvailability = jest.fn()
       .mockImplementation((payload) => Promise.resolve(payload))
     mockThreadCommentRepository.reply = jest.fn()
       .mockImplementation((payload) => Promise.resolve({
@@ -38,8 +38,8 @@ describe('ReplyThreadCommentUseCase', () => {
     await replyThreadCommentUseCase.execute(useCasePayload)
 
     // Assert
-    expect(mockThreadRepository.getById).toBeCalledWith(useCasePayload.threadId)
-    expect(mockThreadCommentRepository.getById).toBeCalledWith(useCasePayload.parentId)
+    expect(mockThreadRepository.checkAvailability).toBeCalledWith(useCasePayload.threadId)
+    expect(mockThreadCommentRepository.checkAvailability).toBeCalledWith(useCasePayload.parentId)
     expect(mockThreadCommentRepository.reply).toBeCalledWith(useCasePayload)
   })
 })

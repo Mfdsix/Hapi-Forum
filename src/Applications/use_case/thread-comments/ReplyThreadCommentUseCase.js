@@ -9,8 +9,8 @@ class ReplyThreadCommentUseCase {
   async execute (useCasePayload) {
     const payload = new ReplyThreadComment(useCasePayload)
 
-    await this._threadRepository.getById(payload.threadId)
-    await this._threadCommentRepository.getById(payload.parentId)
+    await this._threadRepository.checkAvailability(payload.threadId)
+    await this._threadCommentRepository.checkAvailability(payload.parentId)
     return this._threadCommentRepository.reply(payload)
   }
 }
