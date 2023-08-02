@@ -45,6 +45,7 @@ describe('ThreadCommentRepositoryPostgres', () => {
       expect(comments[0]).toHaveProperty('username')
       expect(comments[0]).toHaveProperty('date')
       expect(comments[0].id).toEqual('comment-1')
+      expect(comments[0].content).toEqual('test')
     })
   })
 
@@ -74,6 +75,7 @@ describe('ThreadCommentRepositoryPostgres', () => {
       expect(comments[0]).toHaveProperty('username')
       expect(comments[0]).toHaveProperty('date')
       expect(comments[0].id).toEqual('comment-2')
+      expect(comments[0].content).toEqual('comment test reply')
     })
   })
 
@@ -100,6 +102,7 @@ describe('ThreadCommentRepositoryPostgres', () => {
       expect(comment).toHaveProperty('content')
       expect(comment).toHaveProperty('username')
       expect(comment.id).toEqual('comment-1')
+      expect(comment.content).toEqual('test')
     })
   })
 
@@ -116,6 +119,7 @@ describe('ThreadCommentRepositoryPostgres', () => {
 
       // Action
       const created = await threadCommentRepositoryPostgres.create(payload)
+      const getOne = await threadCommentRepositoryPostgres.getById('comment-123')
 
       // Assert
       expect(created).toEqual(new CreatedThreadComment({
@@ -127,6 +131,12 @@ describe('ThreadCommentRepositoryPostgres', () => {
       expect(created).toHaveProperty('content')
       expect(created).toHaveProperty('owner')
       expect(created.id).toEqual('comment-123')
+      expect(getOne).toHaveProperty('id')
+      expect(getOne).toHaveProperty('content')
+      expect(getOne).toHaveProperty('username')
+      expect(getOne).toHaveProperty('date')
+      expect(getOne.id).toEqual(created.id)
+      expect(getOne.content).toEqual(created.content)
     })
   })
 
