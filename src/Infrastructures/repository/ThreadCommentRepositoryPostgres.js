@@ -35,7 +35,7 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
     }
     const result = await this._pool.query(query)
 
-    return result.rows.map(this._transformData)
+    return result.rows
   }
 
   async getById (id) {
@@ -52,7 +52,7 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
       throw new NotFoundError('komentar tidak ditemukan')
     }
 
-    return this._transformData(result.rows[0])
+    return result.rows[0]
   }
 
   async create (payload) {
@@ -127,24 +127,6 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
 
   async checkAvailability (commentId) {
     return this.getById(commentId)
-  }
-
-  _transformData (data) {
-    let content = data.content
-    if (data.deleted_at) {
-      if (data.parent) {
-        content = '**balasan telah dihapus**'
-      } else {
-        content = '**komentar telah dihapus**'
-      }
-    }
-
-    return {
-      id: data.id,
-      content,
-      username: data.username,
-      date: data.created_at
-    }
   }
 }
 

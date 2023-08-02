@@ -165,6 +165,8 @@ describe('ThreadCommentRepositoryPostgres', () => {
       expect(created).toHaveProperty('content')
       expect(created).toHaveProperty('owner')
       expect(created.id).toEqual('comment-1234')
+      expect(created.content).toEqual(payload.content)
+      expect(created.owner).toEqual(payload.owner)
     })
   })
 
