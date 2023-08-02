@@ -8,21 +8,28 @@ describe('GetByIdThreadUseCase', () => {
    */
   it('should orchestrating the get one thread by id action correctly', async () => {
     // Arrange
+    const currDate = new Date().toISOString()
     const mockAddedThreads = [
       {
         id: 'thread-1',
         title: 'Thread 1',
-        owner: 'owner1'
+        body: 'content of Thread 1',
+        username: 'owner1',
+        date: currDate
       },
       {
         id: 'thread-2',
         title: 'Thread 2',
-        owner: 'owner2'
+        body: 'content of Thread 2',
+        username: 'owner1',
+        date: currDate
       },
       {
         id: 'thread-3',
         title: 'Thread 3',
-        owner: 'owner3'
+        body: 'content of Thread 3',
+        username: 'owner1',
+        date: currDate
       }
     ]
 
@@ -38,7 +45,8 @@ describe('GetByIdThreadUseCase', () => {
         {
           id: 'comment-1',
           content: 'comment content',
-          owner: 'user-1'
+          username: 'user-1',
+          date: currDate
         }
       ]))
     mockThreadCommentRepository.getReplyByCommentId = jest.fn()
@@ -46,7 +54,8 @@ describe('GetByIdThreadUseCase', () => {
         {
           id: 'comment-1',
           content: 'comment content',
-          owner: 'user-1'
+          username: 'user-1',
+          date: currDate
         }
       ]))
 
@@ -65,13 +74,30 @@ describe('GetByIdThreadUseCase', () => {
     expect(mockThreadRepository.getById).toBeCalledTimes(mockAddedThreads.length)
     expect(mockThreadCommentRepository.getByThreadId).toBeCalledTimes(mockAddedThreads.length)
     expect(mockThreadCommentRepository.getReplyByCommentId).toBeCalledTimes(mockAddedThreads.length)
+    expect(thread1).toHaveProperty('id')
+    expect(thread1).toHaveProperty('title')
+    expect(thread1).toHaveProperty('body')
+    expect(thread1).toHaveProperty('username')
+    expect(thread1).toHaveProperty('date')
     expect(thread1.id).toStrictEqual(mockAddedThreads[0].id)
+    expect(thread1.title).toStrictEqual(mockAddedThreads[0].title)
+    expect(thread1.body).toStrictEqual(mockAddedThreads[0].body)
+    expect(thread1.username).toStrictEqual(mockAddedThreads[0].username)
+    expect(thread1.date).toStrictEqual(mockAddedThreads[0].date)
     expect(thread2.id).toStrictEqual(mockAddedThreads[1].id)
     expect(thread3.id).toStrictEqual(mockAddedThreads[2].id)
     expect(thread1.comments.length).toEqual(1)
     expect(thread2.comments.length).toEqual(1)
     expect(thread3.comments.length).toEqual(1)
+    expect(thread1.comments[0]).toHaveProperty('id')
+    expect(thread1.comments[0]).toHaveProperty('content')
+    expect(thread1.comments[0]).toHaveProperty('username')
+    expect(thread1.comments[0]).toHaveProperty('date')
     expect(thread1.comments[0].replies.length).toEqual(1)
+    expect(thread1.comments[0].replies[0]).toHaveProperty('id')
+    expect(thread1.comments[0].replies[0]).toHaveProperty('content')
+    expect(thread1.comments[0].replies[0]).toHaveProperty('username')
+    expect(thread1.comments[0].replies[0]).toHaveProperty('date')
     expect(thread2.comments[0].replies.length).toEqual(1)
     expect(thread3.comments[0].replies.length).toEqual(1)
   })
