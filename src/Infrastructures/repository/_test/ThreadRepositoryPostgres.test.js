@@ -105,7 +105,6 @@ describe('ThreadRepositoryPostgres', () => {
   })
 
   describe('updateById function', () => {
-
     it('should throw error when not owner of thread', async () => {
       // Arrange
       await ThreadsTableTestHelper.seed()
@@ -146,7 +145,6 @@ describe('ThreadRepositoryPostgres', () => {
   })
 
   describe('deleteById function', () => {
-
     it('should throw error when not owner of thread', async () => {
       // Arrange
       await ThreadsTableTestHelper.seed()
