@@ -77,10 +77,12 @@ describe('a UpdateThread entities', () => {
     }
 
     // Action
-    const { title, body } = new UpdateThread(payload)
+    const { id, title, body, userId } = new UpdateThread(payload)
 
     // Assert
+    expect(id).toEqual(payload.id)
     expect(title).toEqual(payload.title)
     expect(body).toEqual(payload.body)
+    expect(userId).toEqual(payload.userId)
   })
 })
