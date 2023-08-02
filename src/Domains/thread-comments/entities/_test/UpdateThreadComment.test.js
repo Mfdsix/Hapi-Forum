@@ -44,11 +44,11 @@ describe('a UpdateThreadComment entities', () => {
     }
 
     // Action
-    const { id, content, owner } = new UpdateThreadComment(payload)
+    const { id, content, userId } = new UpdateThreadComment(payload)
 
     // Assert
     expect(id).toEqual(payload.id)
     expect(content).toEqual(payload.content)
-    expect(owner).toEqual(payload.owner)
+    expect(userId).toEqual(payload.userId)
   })
 })
