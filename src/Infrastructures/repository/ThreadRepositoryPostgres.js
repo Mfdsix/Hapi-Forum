@@ -53,8 +53,6 @@ class ThreadRepositoryPostgres extends ThreadRepository {
   async updateById (payload) {
     const { id, title, body, userId } = payload
 
-    await this.getById(id)
-
     const query = {
       text: 'UPDATE threads SET title = $1, body = $2 WHERE id = $3 AND owner = $4 RETURNING id',
       values: [title, body, id, userId]
@@ -71,8 +69,6 @@ class ThreadRepositoryPostgres extends ThreadRepository {
   async deleteById ({
     id, userId
   }) {
-    await this.getById(id)
-
     const query = {
       text: 'DELETE FROM threads WHERE id = $1 AND owner = $2 RETURNING id',
       values: [id, userId]

@@ -6,6 +6,7 @@ class UpdateThreadByIdThreadUseCase {
   }
 
   async execute (useCasePayload) {
+    this._threadRepository.checkAvailability(useCasePayload.id)
     return this._threadRepository.updateById(new UpdateThread(useCasePayload))
   }
 }
