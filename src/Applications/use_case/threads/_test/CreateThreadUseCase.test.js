@@ -14,11 +14,11 @@ describe('CreateThreadUseCase', () => {
 
     // Mocking
     mockThreadRepository.create = jest.fn()
-      .mockImplementation((payload) => Promise.resolve({
+      .mockImplementation((payload) => Promise.resolve(new CreatedThread({
         id: 'thread-123',
-        title: useCasePayload.title,
-        owner: useCasePayload.owner
-      }))
+        title: payload.title,
+        owner: payload.owner
+      })))
 
     // create use case instance
     const createThreadUseCase = new CreateThreadUseCase({
@@ -26,9 +26,14 @@ describe('CreateThreadUseCase', () => {
     })
 
     // Action
-    await createThreadUseCase.execute(useCasePayload)
+    const created = await createThreadUseCase.execute(useCasePayload)
 
     // Assert
     expect(mockThreadRepository.create).toBeCalledWith(useCasePayload)
+    expect(created).toEqual(new CreatedThread({
+      id: 'thread-123',
+      title: useCasePayload.title,
+      owner: useCasePayload.owner
+    }))
   })
 })
