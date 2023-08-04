@@ -12,7 +12,7 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
 
   async getByThreadId (threadId) {
     const query = {
-      text: `SELECT c.id, c.content, c.parent, c.created_at, c.deleted_at, u.username
+      text: `SELECT c.*, u.username
       FROM thread_comments c
       LEFT JOIN users u ON u.id = c.owner
       WHERE c.thread = $1 AND c.parent IS NULL
@@ -26,7 +26,7 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
 
   async getReplyByCommentId (commentId) {
     const query = {
-      text: `SELECT c.id, c.content, c.parent, c.created_at, c.deleted_at, u.username
+      text: `SELECT c.*, u.username
       FROM thread_comments c
       LEFT JOIN users u ON u.id = c.owner
       WHERE c.parent = $1
@@ -40,17 +40,13 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
 
   async getById (id) {
     const query = {
-      text: `SELECT c.id, c.content, c.parent, c.created_at, c.deleted_at, u.username
+      text: `SELECT c.*, u.username
       FROM thread_comments c
       LEFT JOIN users u ON u.id = c.owner
       WHERE c.id = $1`,
       values: [id]
     }
     const result = await this._pool.query(query)
-
-    if (result.rows.length !== 1) {
-      throw new NotFoundError('komentar tidak ditemukan')
-    }
 
     return result.rows[0]
   }
@@ -90,17 +86,11 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
   async updateById (payload) {
     const { id, content, userId } = payload
 
-    await this.getById(id)
-
     const query = {
       text: 'UPDATE thread_comments SET content = $1 WHERE id = $2 AND owner = $3 RETURNING id',
       values: [content, id, userId]
     }
     const result = await this._pool.query(query)
-
-    if (result.rows.length !== 1) {
-      throw new AuthorizationError('tidak dapat mengakses komentar')
-    }
 
     return result.rows[0].id
   }
@@ -108,8 +98,6 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
   async deleteById ({
     id, userId
   }) {
-    await this.getById(id)
-
     const deletedAt = new Date().toISOString()
 
     const query = {
@@ -118,15 +106,44 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
     }
     const result = await this._pool.query(query)
 
-    if (result.rows.length !== 1) {
-      throw new AuthorizationError('tidak dapat mengakses komentar')
-    }
-
     return result.rows[0].id
   }
 
   async checkAvailability (commentId) {
-    return this.getById(commentId)
+    const query = {
+      text: `SELECT c.*, u.username
+      FROM thread_comments c
+      LEFT JOIN users u ON u.id = c.owner
+      WHERE c.id = $1`,
+      values: [commentId]
+    }
+    const result = await this._pool.query(query)
+
+    if (result.rows.length !== 1) {
+      throw new NotFoundError('komentar tidak ditemukan')
+    }
+
+    return true
+  }
+
+  async checkAccess ({
+    commentId,
+    userId
+  }) {
+    const query = {
+      text: `SELECT c.*, u.username
+      FROM thread_comments c
+      LEFT JOIN users u ON u.id = c.owner
+      WHERE c.id = $1 AND c.owner = $2`,
+      values: [commentId, userId]
+    }
+    const result = await this._pool.query(query)
+
+    if (result.rows.length !== 1) {
+      throw new AuthorizationError('tidak dapat mengakses komentar')
+    }
+
+    return true
   }
 }
 

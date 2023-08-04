@@ -14,5 +14,6 @@ describe('ThreadCommentRepository interface', () => {
     await expect(threadCommentRepository.reply({})).rejects.toThrowError('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED')
     await expect(threadCommentRepository.updateById({})).rejects.toThrowError('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED')
     await expect(threadCommentRepository.deleteById({})).rejects.toThrowError('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED')
+    await expect(threadCommentRepository.checkAccess({})).rejects.toThrowError('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED')
   })
 })

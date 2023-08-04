@@ -30,6 +30,10 @@ class ThreadCommentRepository {
   async deleteById (deleteThreadComment) {
     throw new Error('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED')
   }
+
+  async checkAccess (payload) {
+    throw new Error('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED')
+  }
 }
 
 module.exports = ThreadCommentRepository

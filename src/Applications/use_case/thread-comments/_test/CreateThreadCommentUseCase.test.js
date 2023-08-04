@@ -3,7 +3,6 @@ const ThreadCommentRepository = require('../../../../Domains/thread-comments/Thr
 const CreateThreadCommentUseCase = require('../CreateThreadCommentUseCase')
 const CreatedThreadComment = require('../../../../Domains/thread-comments/entities/CreatedThreadComment')
 const CreateThreadComment = require('../../../../Domains/thread-comments/entities/CreateThreadComment')
-const { payload } = require('@hapi/hapi/lib/validation')
 
 describe('CreateThreadCommentUseCase', () => {
   it('should orchestrating the create comment action correctly', async () => {
@@ -20,11 +19,11 @@ describe('CreateThreadCommentUseCase', () => {
     mockThreadRepository.checkAvailability = jest.fn()
       .mockImplementation((payload) => Promise.resolve(payload))
     mockThreadCommentRepository.create = jest.fn()
-      .mockImplementation((payload) => Promise.resolve({
+      .mockImplementation((payload) => Promise.resolve(new CreatedThreadComment({
         id: 'comment-123',
         content: payload.content,
         owner: payload.owner
-      }))
+      })))
 
     // create use case instance
     const createThreadCommentUseCase = new CreateThreadCommentUseCase({

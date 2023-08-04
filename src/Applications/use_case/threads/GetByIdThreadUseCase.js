@@ -5,6 +5,7 @@ class GetByIdThreadUseCase {
   }
 
   async execute (useCasePayload) {
+    await this._threadRepository.checkAvailability(useCasePayload)
     const thread = await this._threadRepository.getById(useCasePayload)
     const comments = await this._threadCommentRepository.getByThreadId(thread.id)
 
@@ -16,8 +17,18 @@ class GetByIdThreadUseCase {
     }
 
     return {
-      ...thread,
+      ...this._transformThread(thread),
       comments
+    }
+  }
+
+  _transformThread (data) {
+    return {
+      id: data.id,
+      title: data.title,
+      body: data.body,
+      username: data.username,
+      date: data.created_at
     }
   }
 

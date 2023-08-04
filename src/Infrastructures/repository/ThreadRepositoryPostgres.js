@@ -20,7 +20,7 @@ class ThreadRepositoryPostgres extends ThreadRepository {
   async getById (id) {
     const query = {
       text: `SELECT
-      t.id, t.title, t.body, t.created_at, u.username
+      t.*, u.username
       FROM threads t
       LEFT JOIN users u ON u.id = t.owner
       WHERE t.id = $1`,
@@ -28,11 +28,7 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     }
     const result = await this._pool.query(query)
 
-    if (result.rows.length !== 1) {
-      throw new NotFoundError('thread tidak ditemukan')
-    }
-
-    return this._transformData(result.rows[0])
+    return result.rows[0]
   }
 
   async create (payload) {
@@ -59,10 +55,6 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     }
     const result = await this._pool.query(query)
 
-    if (result.rows.length !== 1) {
-      throw new AuthorizationError('tidak dapat mengakses thread')
-    }
-
     return result.rows[0].id
   }
 
@@ -75,25 +67,46 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     }
     const result = await this._pool.query(query)
 
-    if (result.rows.length !== 1) {
-      throw new AuthorizationError('tidak dapat mengakses thread')
-    }
-
     return result.rows[0].id
   }
 
   async checkAvailability (id) {
-    return this.getById(id)
+    const query = {
+      text: `SELECT
+      t.*, u.username
+      FROM threads t
+      LEFT JOIN users u ON u.id = t.owner
+      WHERE t.id = $1`,
+      values: [id]
+    }
+    const result = await this._pool.query(query)
+
+    if (result.rows.length !== 1) {
+      throw new NotFoundError('thread tidak ditemukan')
+    }
+
+    return true
   }
 
-  _transformData (data) {
-    return {
-      id: data.id,
-      title: data.title,
-      body: data.body,
-      username: data.username,
-      date: data.created_at
+  async checkAccess ({
+    threadId,
+    userId
+  }) {
+    const query = {
+      text: `SELECT
+      t.*, u.username
+      FROM threads t
+      LEFT JOIN users u ON u.id = t.owner
+      WHERE t.id = $1 AND t.owner = $2`,
+      values: [threadId, userId]
     }
+    const result = await this._pool.query(query)
+
+    if (result.rows.length !== 1) {
+      throw new AuthorizationError('tidak dapat mengakses thread')
+    }
+
+    return true
   }
 }
 

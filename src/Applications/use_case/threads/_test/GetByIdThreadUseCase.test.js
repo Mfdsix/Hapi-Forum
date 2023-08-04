@@ -15,21 +15,21 @@ describe('GetByIdThreadUseCase', () => {
         title: 'Thread 1',
         body: 'content of Thread 1',
         username: 'owner1',
-        date: currDate
+        created_at: currDate
       },
       {
         id: 'thread-2',
         title: 'Thread 2',
         body: 'content of Thread 2',
         username: 'owner1',
-        date: currDate
+        created_at: currDate
       },
       {
         id: 'thread-3',
         title: 'Thread 3',
         body: 'content of Thread 3',
         username: 'owner1',
-        date: currDate
+        created_at: currDate
       }
     ]
 
@@ -40,6 +40,8 @@ describe('GetByIdThreadUseCase', () => {
     /** mocking needed function */
     mockThreadRepository.getById = jest.fn()
       .mockImplementation((id) => Promise.resolve(mockAddedThreads.filter((thread) => thread.id === id)[0]))
+    mockThreadRepository.checkAvailability = jest.fn()
+      .mockImplementation((id) => Promise.resolve())
     mockThreadCommentRepository.getByThreadId = jest.fn()
       .mockImplementation((id) => Promise.resolve([
         {
@@ -83,7 +85,7 @@ describe('GetByIdThreadUseCase', () => {
     expect(thread1.title).toStrictEqual(mockAddedThreads[0].title)
     expect(thread1.body).toStrictEqual(mockAddedThreads[0].body)
     expect(thread1.username).toStrictEqual(mockAddedThreads[0].username)
-    expect(thread1.date).toStrictEqual(mockAddedThreads[0].date)
+    expect(thread1.date).toStrictEqual(mockAddedThreads[0].created_at)
     expect(thread2.id).toStrictEqual(mockAddedThreads[1].id)
     expect(thread3.id).toStrictEqual(mockAddedThreads[2].id)
     expect(thread1.comments.length).toEqual(1)
@@ -100,5 +102,221 @@ describe('GetByIdThreadUseCase', () => {
     expect(thread1.comments[0].replies[0]).toHaveProperty('date')
     expect(thread2.comments[0].replies.length).toEqual(1)
     expect(thread3.comments[0].replies.length).toEqual(1)
+  })
+
+  it('should return correct transformed thread data', async () => {
+    const currDate = new Date().toISOString()
+    const threadData = {
+      id: 'thread-1',
+      title: 'thread title',
+      body: 'thread body',
+      owner: 'user-1',
+      created_at: currDate
+    }
+
+    /** creating dependency of use case */
+    const mockThreadRepository = new ThreadRepository()
+    const mockThreadCommentRepository = new ThreadCommentRepository()
+
+    /** mocking needed function */
+    mockThreadRepository.getById = jest.fn()
+      .mockImplementation((id) => Promise.resolve())
+    mockThreadCommentRepository.getByThreadId = jest.fn()
+      .mockImplementation((id) => Promise.resolve())
+    mockThreadCommentRepository.getReplyByCommentId = jest.fn()
+      .mockImplementation((id) => Promise.resolve())
+
+    // create use case instance
+    const getByIdThreadUseCase = new GetByIdThreadUseCase({
+      threadRepository: mockThreadRepository,
+      threadCommentRepository: mockThreadCommentRepository
+    })
+
+    // Action
+    const transformed = await getByIdThreadUseCase._transformThread(threadData)
+
+    // Assert
+    expect(transformed).toHaveProperty('id')
+    expect(transformed).toHaveProperty('title')
+    expect(transformed).toHaveProperty('body')
+    expect(transformed).toHaveProperty('username')
+    expect(transformed).toHaveProperty('date')
+    expect(transformed.id).toEqual(threadData.id)
+    expect(transformed.title).toEqual(threadData.title)
+    expect(transformed.body).toEqual(threadData.body)
+    expect(transformed.username).toEqual(threadData.username)
+    expect(transformed.date).toEqual(threadData.created_at)
+  })
+
+  it('should return plain comment when not have parent and not deleted', async () => {
+    const currDate = new Date().toISOString()
+    const commentData = {
+      id: 'comment-1',
+      content: 'comment',
+      username: 'user1',
+      created_at: currDate,
+      parent: null,
+      deleted_at: null
+    }
+
+    /** creating dependency of use case */
+    const mockThreadRepository = new ThreadRepository()
+    const mockThreadCommentRepository = new ThreadCommentRepository()
+
+    /** mocking needed function */
+    mockThreadRepository.getById = jest.fn()
+      .mockImplementation((id) => Promise.resolve())
+    mockThreadCommentRepository.getByThreadId = jest.fn()
+      .mockImplementation((id) => Promise.resolve())
+    mockThreadCommentRepository.getReplyByCommentId = jest.fn()
+      .mockImplementation((id) => Promise.resolve())
+
+    // create use case instance
+    const getByIdThreadUseCase = new GetByIdThreadUseCase({
+      threadRepository: mockThreadRepository,
+      threadCommentRepository: mockThreadCommentRepository
+    })
+
+    // Action
+    const transformed = await getByIdThreadUseCase._transformComment(commentData)
+
+    // Assert
+    expect(transformed).toHaveProperty('id')
+    expect(transformed).toHaveProperty('content')
+    expect(transformed).toHaveProperty('username')
+    expect(transformed).toHaveProperty('date')
+    expect(transformed.id).toEqual(commentData.id)
+    expect(transformed.content).toEqual(commentData.content)
+    expect(transformed.username).toEqual(commentData.username)
+    expect(transformed.date).toEqual(commentData.created_at)
+  })
+
+  it('should return plain comment when have parent and not deleted', async () => {
+    const currDate = new Date().toISOString()
+    const commentData = {
+      id: 'comment-1',
+      content: 'comment',
+      username: 'user1',
+      created_at: currDate,
+      parent: 'comment-parent-1',
+      deleted_at: null
+    }
+
+    /** creating dependency of use case */
+    const mockThreadRepository = new ThreadRepository()
+    const mockThreadCommentRepository = new ThreadCommentRepository()
+
+    /** mocking needed function */
+    mockThreadRepository.getById = jest.fn()
+      .mockImplementation((id) => Promise.resolve())
+    mockThreadCommentRepository.getByThreadId = jest.fn()
+      .mockImplementation((id) => Promise.resolve())
+    mockThreadCommentRepository.getReplyByCommentId = jest.fn()
+      .mockImplementation((id) => Promise.resolve())
+
+    // create use case instance
+    const getByIdThreadUseCase = new GetByIdThreadUseCase({
+      threadRepository: mockThreadRepository,
+      threadCommentRepository: mockThreadCommentRepository
+    })
+
+    // Action
+    const transformed = await getByIdThreadUseCase._transformComment(commentData)
+
+    // Assert
+    expect(transformed).toHaveProperty('id')
+    expect(transformed).toHaveProperty('content')
+    expect(transformed).toHaveProperty('username')
+    expect(transformed).toHaveProperty('date')
+    expect(transformed.id).toEqual(commentData.id)
+    expect(transformed.content).toEqual(commentData.content)
+    expect(transformed.username).toEqual(commentData.username)
+    expect(transformed.date).toEqual(commentData.created_at)
+  })
+
+  it('should return **komentar telah dihapus** when not have parent and deleted', async () => {
+    const currDate = new Date().toISOString()
+    const commentData = {
+      id: 'comment-1',
+      content: 'comment',
+      username: 'user1',
+      created_at: currDate,
+      parent: null,
+      deleted_at: currDate
+    }
+
+    /** creating dependency of use case */
+    const mockThreadRepository = new ThreadRepository()
+    const mockThreadCommentRepository = new ThreadCommentRepository()
+
+    /** mocking needed function */
+    mockThreadRepository.getById = jest.fn()
+      .mockImplementation((id) => Promise.resolve())
+    mockThreadCommentRepository.getByThreadId = jest.fn()
+      .mockImplementation((id) => Promise.resolve())
+    mockThreadCommentRepository.getReplyByCommentId = jest.fn()
+      .mockImplementation((id) => Promise.resolve())
+
+    // create use case instance
+    const getByIdThreadUseCase = new GetByIdThreadUseCase({
+      threadRepository: mockThreadRepository,
+      threadCommentRepository: mockThreadCommentRepository
+    })
+
+    // Action
+    const transformed = await getByIdThreadUseCase._transformComment(commentData)
+
+    // Assert
+    expect(transformed).toHaveProperty('id')
+    expect(transformed).toHaveProperty('content')
+    expect(transformed).toHaveProperty('username')
+    expect(transformed).toHaveProperty('date')
+    expect(transformed.id).toEqual(commentData.id)
+    expect(transformed.content).toEqual('**komentar telah dihapus**')
+    expect(transformed.username).toEqual(commentData.username)
+    expect(transformed.date).toEqual(commentData.created_at)
+  })
+
+  it('should return **balasan telah dihapus** when have parent and deleted', async () => {
+    const currDate = new Date().toISOString()
+    const commentData = {
+      id: 'comment-1',
+      content: 'comment',
+      username: 'user1',
+      created_at: currDate,
+      parent: 'comment-parent-1',
+      deleted_at: currDate
+    }
+
+    /** creating dependency of use case */
+    const mockThreadRepository = new ThreadRepository()
+    const mockThreadCommentRepository = new ThreadCommentRepository()
+
+    /** mocking needed function */
+    mockThreadRepository.getById = jest.fn()
+      .mockImplementation((id) => Promise.resolve())
+    mockThreadCommentRepository.getByThreadId = jest.fn()
+      .mockImplementation((id) => Promise.resolve())
+    mockThreadCommentRepository.getReplyByCommentId = jest.fn()
+      .mockImplementation((id) => Promise.resolve())
+
+    // create use case instance
+    const getByIdThreadUseCase = new GetByIdThreadUseCase({
+      threadRepository: mockThreadRepository,
+      threadCommentRepository: mockThreadCommentRepository
+    })
+
+    // Action
+    const transformed = await getByIdThreadUseCase._transformComment(commentData)
+
+    // Assert
+    expect(transformed).toHaveProperty('id')
+    expect(transformed).toHaveProperty('content')
+    expect(transformed).toHaveProperty('username')
+    expect(transformed).toHaveProperty('date')
+    expect(transformed.id).toEqual(commentData.id)
+    expect(transformed.content).toEqual('**balasan telah dihapus**')
+    expect(transformed.username).toEqual(commentData.username)
+    expect(transformed.date).toEqual(commentData.created_at)
   })
 })

@@ -13,6 +13,10 @@ describe('UpdateThreadCommentUseCase', () => {
     const mockThreadCommentRepository = new ThreadCommentRepository()
 
     // Mocking
+    mockThreadCommentRepository.checkAvailability = jest.fn()
+      .mockImplementation((payload) => Promise.resolve())
+    mockThreadCommentRepository.checkAccess = jest.fn()
+      .mockImplementation((payload) => Promise.resolve())
     mockThreadCommentRepository.updateById = jest.fn()
       .mockImplementation((payload) => payload.id)
 
@@ -25,7 +29,12 @@ describe('UpdateThreadCommentUseCase', () => {
     const updated = await updateThreadCommentUseCase.execute(useCasePayload)
 
     // Assert
-    expect(updated).toEqual(useCasePayload.id)
+    expect(mockThreadCommentRepository.checkAvailability).toBeCalledWith(useCasePayload.id)
+    expect(mockThreadCommentRepository.checkAccess).toBeCalledWith({
+      commentId: useCasePayload.id,
+      userId: useCasePayload.userId
+    })
     expect(mockThreadCommentRepository.updateById).toBeCalledWith(useCasePayload)
+    expect(updated).toEqual(useCasePayload.id)
   })
 })

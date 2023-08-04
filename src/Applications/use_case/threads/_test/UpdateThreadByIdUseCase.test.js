@@ -15,6 +15,8 @@ describe('UpdateByIdThreadUseCase', () => {
     // Mocking
     mockThreadRepository.checkAvailability = jest.fn()
       .mockImplementation((payload) => Promise.resolve())
+    mockThreadRepository.checkAccess = jest.fn()
+      .mockImplementation((payload) => Promise.resolve())
     mockThreadRepository.updateById = jest.fn()
       .mockImplementation((payload) => Promise.resolve({
         id: payload.id
@@ -29,6 +31,11 @@ describe('UpdateByIdThreadUseCase', () => {
     const updated = await updateByIdThreadUseCase.execute(useCasePayload)
 
     // Assert
+    expect(mockThreadRepository.checkAvailability).toBeCalledWith(useCasePayload.id)
+    expect(mockThreadRepository.checkAccess).toBeCalledWith({
+      threadId: useCasePayload.id,
+      userId: useCasePayload.userId
+    })
     expect(mockThreadRepository.updateById).toBeCalledWith(useCasePayload)
     expect(updated).toEqual({
       id: useCasePayload.id

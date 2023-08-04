@@ -46,6 +46,7 @@ describe('ThreadCommentRepositoryPostgres', () => {
       expect(comments[0]).toHaveProperty('created_at')
       expect(comments[0].id).toEqual('comment-1')
       expect(comments[0].content).toEqual('test')
+      expect(comments[0].owner).toEqual('user-1')
     })
   })
 
@@ -76,20 +77,11 @@ describe('ThreadCommentRepositoryPostgres', () => {
       expect(comments[0]).toHaveProperty('created_at')
       expect(comments[0].id).toEqual('comment-2')
       expect(comments[0].content).toEqual('comment test reply')
+      expect(comments[0].owner).toEqual('user-1')
     })
   })
 
   describe('getById function', () => {
-    it('should throw error when no comment found', async () => {
-      // Arrange
-      const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
-
-      // Action & Assert
-      const comment = threadCommentRepositoryPostgres.getById('unique-id')
-
-      await expect(comment).rejects.toThrow(new NotFoundError('komentar tidak ditemukan'))
-    })
-
     it('should throw data when found', async () => {
       // Arrange
       await ThreadCommentsTableTestHelper.seed()
@@ -103,6 +95,7 @@ describe('ThreadCommentRepositoryPostgres', () => {
       expect(comment).toHaveProperty('username')
       expect(comment.id).toEqual('comment-1')
       expect(comment.content).toEqual('test')
+      expect(comment.owner).toEqual('user-1')
     })
   })
 
@@ -153,7 +146,8 @@ describe('ThreadCommentRepositoryPostgres', () => {
       const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, fakeIdGenerator)
 
       // Action
-      const created = await threadCommentRepositoryPostgres.create(payload)
+      const created = await threadCommentRepositoryPostgres.reply(payload)
+      const getOne = await threadCommentRepositoryPostgres.getById('comment-1234')
 
       // Assert
       expect(created).toEqual(new CreatedThreadComment({
@@ -167,40 +161,16 @@ describe('ThreadCommentRepositoryPostgres', () => {
       expect(created.id).toEqual('comment-1234')
       expect(created.content).toEqual(payload.content)
       expect(created.owner).toEqual(payload.owner)
+      expect(getOne).toHaveProperty('id')
+      expect(getOne).toHaveProperty('content')
+      expect(getOne).toHaveProperty('owner')
+      expect(getOne.id).toEqual(created.id)
+      expect(getOne.content).toEqual(created.content)
+      expect(getOne.owner).toEqual(created.owner)
     })
   })
 
   describe('updateById function', () => {
-    it('should throw error when no comment found', async () => {
-      // Arrange
-      const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
-
-      // Action & Assert
-      const updated = threadCommentRepositoryPostgres.updateById({
-        id: 'unique-id',
-        content: 'body of edited comment',
-        userId: 'owner'
-      })
-
-      await expect(updated).rejects.toThrow(new NotFoundError('komentar tidak ditemukan'))
-    })
-
-    it('should throw error when not owner of comment', async () => {
-      // Arrange
-      await ThreadCommentsTableTestHelper.seed()
-      const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
-
-      // Action
-      const updated = threadCommentRepositoryPostgres.updateById({
-        id: 'comment-1',
-        content: 'update content of comment',
-        userId: 'user-random'
-      })
-
-      // Assert
-      await expect(updated).rejects.toThrow(new AuthorizationError('tidak dapat mengakses komentar'))
-    })
-
     it('should update comment by id correctly', async () => {
       // Arrange
       await ThreadCommentsTableTestHelper.seed()
@@ -222,34 +192,6 @@ describe('ThreadCommentRepositoryPostgres', () => {
   })
 
   describe('deleteById function', () => {
-    it('should throw error when no comment found', async () => {
-      // Arrange
-      const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
-
-      // Action & Assert
-      const comment = threadCommentRepositoryPostgres.deleteById({
-        id: 'unique-id',
-        userId: 'user-1'
-      })
-
-      await expect(comment).rejects.toThrow(new NotFoundError('komentar tidak ditemukan'))
-    })
-
-    it('should throw error when not owner of comment', async () => {
-      // Arrange
-      await ThreadCommentsTableTestHelper.seed()
-      const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
-
-      // Action
-      const deleted = threadCommentRepositoryPostgres.deleteById({
-        id: 'comment-1',
-        userId: 'user-random'
-      })
-
-      // Assert
-      await expect(deleted).rejects.toThrow(new AuthorizationError('tidak dapat mengakses komentar'))
-    })
-
     it('should delete comment by id correctly', async () => {
       // Arrange
       await ThreadCommentsTableTestHelper.seed()
@@ -260,9 +202,14 @@ describe('ThreadCommentRepositoryPostgres', () => {
         id: 'comment-1',
         userId: 'user-1'
       })
+      const getOne = await threadCommentRepositoryPostgres.getById('comment-1')
 
       // Assert
       expect(deleted).toEqual('comment-1')
+      expect(getOne).toHaveProperty('deleted_at')
+      expect(getOne.id).toEqual('comment-1')
+      expect(getOne).toHaveProperty('deleted_at')
+      expect(getOne.deleted_at).toBeTruthy()
     })
   })
 })

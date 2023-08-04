@@ -13,6 +13,8 @@ describe('DeleteByIdThreadUseCase', () => {
     // Mocking
     mockThreadRepository.checkAvailability = jest.fn()
       .mockImplementation((payload) => Promise.resolve())
+      mockThreadRepository.checkAccess = jest.fn()
+      .mockImplementation((payload) => Promise.resolve())
     mockThreadRepository.deleteById = jest.fn()
       .mockImplementation(({ id }) => Promise.resolve({
         id
@@ -27,6 +29,11 @@ describe('DeleteByIdThreadUseCase', () => {
     const deleted = await deleteByIdThreadUseCase.execute(useCasePayload)
 
     // Assert
+    expect(mockThreadRepository.checkAvailability).toBeCalledWith(useCasePayload.id)
+    expect(mockThreadRepository.checkAccess).toBeCalledWith({
+      threadId: useCasePayload.id,
+      userId: useCasePayload.userId
+    })
     expect(mockThreadRepository.deleteById).toBeCalledWith(useCasePayload)
     expect(deleted).toEqual({
       id: useCasePayload.id

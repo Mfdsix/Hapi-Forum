@@ -5,6 +5,10 @@ class DeleteThreadByIdThreadUseCase {
 
   async execute (useCasePayload) {
     await this._threadRepository.checkAvailability(useCasePayload.id)
+    await this._threadRepository.checkAccess({
+      threadId: useCasePayload.id,
+      userId: useCasePayload.userId
+    })
     return this._threadRepository.deleteById(useCasePayload)
   }
 }

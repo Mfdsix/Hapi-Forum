@@ -7,6 +7,11 @@ class UpdateThreadCommentUseCase {
 
   async execute (useCasePayload) {
     const payload = new UpdateThreadComment(useCasePayload)
+    await this._threadCommentRepository.checkAvailability(payload.id)
+    await this._threadCommentRepository.checkAccess({
+      commentId: payload.id,
+      userId: payload.userId
+    })
     return this._threadCommentRepository.updateById(payload)
   }
 }
