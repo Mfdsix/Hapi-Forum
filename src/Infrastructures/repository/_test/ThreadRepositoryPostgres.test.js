@@ -1,5 +1,7 @@
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper')
+const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper')
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError')
+
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError')
 const CreateThread = require('../../../Domains/threads/entities/CreateThread')
 const CreatedThread = require('../../../Domains/threads/entities/CreatedThread')
@@ -7,8 +9,15 @@ const pool = require('../../database/postgres/pool')
 const ThreadRepositoryPostgres = require('../ThreadRepositoryPostgres')
 
 describe('ThreadRepositoryPostgres', () => {
+  let userId, userName
+
   beforeEach(async () => {
     await ThreadsTableTestHelper.cleanTable()
+    await UsersTableTestHelper.cleanTable()
+
+    const { id, username } = await UsersTableTestHelper.addUser()
+    userId = id
+    userName = username
   })
 
   afterAll(async () => {
@@ -48,7 +57,7 @@ describe('ThreadRepositoryPostgres', () => {
   describe('getById function', () => {
     it('should throw data when found', async () => {
       // Arrange
-      await ThreadsTableTestHelper.seed()
+      await ThreadsTableTestHelper.seed(userId)
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {})
 
       // Action & Assert
@@ -63,8 +72,62 @@ describe('ThreadRepositoryPostgres', () => {
       expect(thread.id).toEqual('thread-123')
       expect(thread.title).toEqual('test')
       expect(thread.body).toEqual('body of test')
-      expect(thread.owner).toEqual('owner-1')
+      expect(thread.owner).toEqual(userId)
+      expect(thread.username).toEqual(userName)
       expect(thread.created_at).toBeTruthy()
+    })
+  })
+
+  describe('checkAvailability function', () => {
+    it('should throw 404 when not found', async () => {
+      // Arrange
+      const threadCommentRepositoryPostgres = new ThreadRepositoryPostgres(pool, {})
+
+      // Action & Assert
+      const comment = threadCommentRepositoryPostgres.checkAvailability('thread-1')
+
+      await (expect(comment)).rejects.toThrow(new NotFoundError('thread tidak ditemukan'))
+    })
+
+    it('should resolves when found', async () => {
+      // Arrange
+      await ThreadsTableTestHelper.seed(userId)
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {})
+
+      // Action & Assert
+      const thread = threadRepositoryPostgres.checkAvailability('thread-123')
+
+      await (expect(thread)).resolves
+    })
+  })
+
+  describe('checkAccess function', () => {
+    it('should throw 403 when not owner', async () => {
+      // Arrange
+      await ThreadsTableTestHelper.seed(userId)
+      const threadCommentRepositoryPostgres = new ThreadRepositoryPostgres(pool, {})
+
+      // Action & Assert
+      const comment = threadCommentRepositoryPostgres.checkAccess({
+        threadId: 'thread-1',
+        userId: 'user-random'
+      })
+
+      await (expect(comment)).rejects.toThrow(new AuthorizationError('tidak dapat mengakses thread'))
+    })
+
+    it('should resolves when access by owner', async () => {
+      // Arrange
+      await ThreadsTableTestHelper.seed(userId)
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {})
+
+      // Action & Assert
+      const thread = threadRepositoryPostgres.checkAccess({
+        threadId: 'thread-123',
+        userId
+      })
+
+      await (expect(thread)).resolves
     })
   })
 
@@ -104,7 +167,6 @@ describe('ThreadRepositoryPostgres', () => {
   })
 
   describe('updateById function', () => {
-
     it('should update thread by id correctly', async () => {
       // Arrange
       await ThreadsTableTestHelper.seed()

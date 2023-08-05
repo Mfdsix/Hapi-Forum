@@ -84,8 +84,6 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     if (result.rows.length !== 1) {
       throw new NotFoundError('thread tidak ditemukan')
     }
-
-    return true
   }
 
   async checkAccess ({
@@ -105,8 +103,6 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     if (result.rows.length !== 1) {
       throw new AuthorizationError('tidak dapat mengakses thread')
     }
-
-    return true
   }
 }
 

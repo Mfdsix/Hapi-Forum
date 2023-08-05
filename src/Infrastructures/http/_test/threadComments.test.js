@@ -231,7 +231,9 @@ describe('/threads/{threadId}/comments endpoint', () => {
       const server = await createServer(container)
 
       // Action
-      const commentId = await ThreadCommentsTableTestHelper.seed(userId)
+      const commentId = await ThreadCommentsTableTestHelper.seed({
+        userId
+      })
       const response = await server.inject({
         method: 'DELETE',
         url: `/threads/${threadId}/comments/${commentId}`,
@@ -309,7 +311,10 @@ describe('/threads/{threadId}/comments endpoint', () => {
 
       // Action
       const commentId = await ThreadCommentsTableTestHelper.seed(userId)
-      const replyId = await ThreadCommentsTableTestHelper.reply(commentId, userId)
+      const replyId = await ThreadCommentsTableTestHelper.reply({
+        commentId,
+        userId
+      })
       const response = await server.inject({
         method: 'DELETE',
         url: `/threads/${threadId}/comments/${commentId}/replies/${replyId}`,

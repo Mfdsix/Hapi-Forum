@@ -15,6 +15,7 @@ describe('GetByIdThreadUseCase', () => {
         title: 'Thread 1',
         body: 'content of Thread 1',
         username: 'owner1',
+        owner: 'user-1',
         created_at: currDate
       },
       {
@@ -22,6 +23,7 @@ describe('GetByIdThreadUseCase', () => {
         title: 'Thread 2',
         body: 'content of Thread 2',
         username: 'owner1',
+        owner: 'user-1',
         created_at: currDate
       },
       {
@@ -29,9 +31,22 @@ describe('GetByIdThreadUseCase', () => {
         title: 'Thread 3',
         body: 'content of Thread 3',
         username: 'owner1',
+        owner: 'user-1',
         created_at: currDate
       }
     ]
+    const threadComment = {
+      id: 'comment-1',
+      content: 'comment content',
+      username: 'user-1',
+      created_at: currDate
+    }
+    const threadCommentReply = {
+      id: 'comment-1',
+      content: 'comment content',
+      username: 'user-1',
+      created_at: currDate
+    }
 
     /** creating dependency of use case */
     const mockThreadRepository = new ThreadRepository()
@@ -44,21 +59,11 @@ describe('GetByIdThreadUseCase', () => {
       .mockImplementation((id) => Promise.resolve())
     mockThreadCommentRepository.getByThreadId = jest.fn()
       .mockImplementation((id) => Promise.resolve([
-        {
-          id: 'comment-1',
-          content: 'comment content',
-          username: 'user-1',
-          date: currDate
-        }
+        threadComment
       ]))
     mockThreadCommentRepository.getReplyByCommentId = jest.fn()
       .mockImplementation((id) => Promise.resolve([
-        {
-          id: 'comment-1',
-          content: 'comment content',
-          username: 'user-1',
-          date: currDate
-        }
+        threadCommentReply
       ]))
 
     // create use case instance
@@ -76,6 +81,7 @@ describe('GetByIdThreadUseCase', () => {
     expect(mockThreadRepository.getById).toBeCalledTimes(mockAddedThreads.length)
     expect(mockThreadCommentRepository.getByThreadId).toBeCalledTimes(mockAddedThreads.length)
     expect(mockThreadCommentRepository.getReplyByCommentId).toBeCalledTimes(mockAddedThreads.length)
+
     expect(thread1).toHaveProperty('id')
     expect(thread1).toHaveProperty('title')
     expect(thread1).toHaveProperty('body')
@@ -86,22 +92,90 @@ describe('GetByIdThreadUseCase', () => {
     expect(thread1.body).toStrictEqual(mockAddedThreads[0].body)
     expect(thread1.username).toStrictEqual(mockAddedThreads[0].username)
     expect(thread1.date).toStrictEqual(mockAddedThreads[0].created_at)
+
+    expect(thread2).toHaveProperty('id')
+    expect(thread2).toHaveProperty('title')
+    expect(thread2).toHaveProperty('body')
+    expect(thread2).toHaveProperty('username')
+    expect(thread2).toHaveProperty('date')
     expect(thread2.id).toStrictEqual(mockAddedThreads[1].id)
+    expect(thread2.title).toStrictEqual(mockAddedThreads[1].title)
+    expect(thread2.body).toStrictEqual(mockAddedThreads[1].body)
+    expect(thread2.username).toStrictEqual(mockAddedThreads[1].username)
+    expect(thread2.date).toStrictEqual(mockAddedThreads[1].created_at)
+
+    expect(thread3).toHaveProperty('id')
+    expect(thread3).toHaveProperty('title')
+    expect(thread3).toHaveProperty('body')
+    expect(thread3).toHaveProperty('username')
+    expect(thread3).toHaveProperty('date')
     expect(thread3.id).toStrictEqual(mockAddedThreads[2].id)
+    expect(thread3.id).toStrictEqual(mockAddedThreads[2].id)
+    expect(thread3.title).toStrictEqual(mockAddedThreads[2].title)
+    expect(thread3.body).toStrictEqual(mockAddedThreads[2].body)
+    expect(thread3.username).toStrictEqual(mockAddedThreads[2].username)
+    expect(thread3.date).toStrictEqual(mockAddedThreads[2].created_at)
+
     expect(thread1.comments.length).toEqual(1)
     expect(thread2.comments.length).toEqual(1)
     expect(thread3.comments.length).toEqual(1)
+
     expect(thread1.comments[0]).toHaveProperty('id')
     expect(thread1.comments[0]).toHaveProperty('content')
     expect(thread1.comments[0]).toHaveProperty('username')
     expect(thread1.comments[0]).toHaveProperty('date')
+    expect(thread1.comments[0].id).toEqual(threadComment.id)
+    expect(thread1.comments[0].content).toEqual(threadComment.content)
+    expect(thread1.comments[0].username).toEqual(threadComment.username)
+    expect(thread1.comments[0].date).toEqual(threadComment.created_at)
+
     expect(thread1.comments[0].replies.length).toEqual(1)
     expect(thread1.comments[0].replies[0]).toHaveProperty('id')
     expect(thread1.comments[0].replies[0]).toHaveProperty('content')
     expect(thread1.comments[0].replies[0]).toHaveProperty('username')
     expect(thread1.comments[0].replies[0]).toHaveProperty('date')
+    expect(thread1.comments[0].replies[0].id).toEqual(threadCommentReply.id)
+    expect(thread1.comments[0].replies[0].content).toEqual(threadCommentReply.content)
+    expect(thread1.comments[0].replies[0].username).toEqual(threadCommentReply.username)
+    expect(thread1.comments[0].replies[0].date).toEqual(threadCommentReply.created_at)
+
+    expect(thread2.comments[0]).toHaveProperty('id')
+    expect(thread2.comments[0]).toHaveProperty('content')
+    expect(thread2.comments[0]).toHaveProperty('username')
+    expect(thread2.comments[0]).toHaveProperty('date')
+    expect(thread2.comments[0].id).toEqual(threadComment.id)
+    expect(thread2.comments[0].content).toEqual(threadComment.content)
+    expect(thread2.comments[0].username).toEqual(threadComment.username)
+    expect(thread2.comments[0].date).toEqual(threadComment.created_at)
+
     expect(thread2.comments[0].replies.length).toEqual(1)
+    expect(thread2.comments[0].replies[0]).toHaveProperty('id')
+    expect(thread2.comments[0].replies[0]).toHaveProperty('content')
+    expect(thread2.comments[0].replies[0]).toHaveProperty('username')
+    expect(thread2.comments[0].replies[0]).toHaveProperty('date')
+    expect(thread2.comments[0].replies[0].id).toEqual(threadCommentReply.id)
+    expect(thread2.comments[0].replies[0].content).toEqual(threadCommentReply.content)
+    expect(thread2.comments[0].replies[0].username).toEqual(threadCommentReply.username)
+    expect(thread2.comments[0].replies[0].date).toEqual(threadCommentReply.created_at)
+
+    expect(thread3.comments[0]).toHaveProperty('id')
+    expect(thread3.comments[0]).toHaveProperty('content')
+    expect(thread3.comments[0]).toHaveProperty('username')
+    expect(thread3.comments[0]).toHaveProperty('date')
+    expect(thread3.comments[0].id).toEqual(threadComment.id)
+    expect(thread3.comments[0].content).toEqual(threadComment.content)
+    expect(thread3.comments[0].username).toEqual(threadComment.username)
+    expect(thread3.comments[0].date).toEqual(threadComment.created_at)
+
     expect(thread3.comments[0].replies.length).toEqual(1)
+    expect(thread3.comments[0].replies[0]).toHaveProperty('id')
+    expect(thread3.comments[0].replies[0]).toHaveProperty('content')
+    expect(thread3.comments[0].replies[0]).toHaveProperty('username')
+    expect(thread3.comments[0].replies[0]).toHaveProperty('date')
+    expect(thread3.comments[0].replies[0].id).toEqual(threadCommentReply.id)
+    expect(thread3.comments[0].replies[0].content).toEqual(threadCommentReply.content)
+    expect(thread3.comments[0].replies[0].username).toEqual(threadCommentReply.username)
+    expect(thread3.comments[0].replies[0].date).toEqual(threadCommentReply.created_at)
   })
 
   it('should return correct transformed thread data', async () => {

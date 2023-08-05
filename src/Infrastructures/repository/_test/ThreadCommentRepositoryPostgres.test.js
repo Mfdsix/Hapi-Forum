@@ -1,18 +1,25 @@
 const ThreadCommentsTableTestHelper = require('../../../../tests/ThreadCommentsTableTestHelper')
-const ThreadCommentRepositoryPostgres = require('../ThreadCommentRepositoryPostgres')
+const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper')
 
-const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError')
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError')
 
+const ThreadCommentRepositoryPostgres = require('../ThreadCommentRepositoryPostgres')
 const CreateThreadComment = require('../../../Domains/thread-comments/entities/CreateThreadComment')
 const CreatedThreadComment = require('../../../Domains/thread-comments/entities/CreatedThreadComment')
 const ReplyThreadComment = require('../../../Domains/thread-comments/entities/ReplyThreadComment')
 
 const pool = require('../../database/postgres/pool')
+const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError')
 
 describe('ThreadCommentRepositoryPostgres', () => {
-  afterEach(async () => {
+  let userId
+
+  beforeEach(async () => {
     await ThreadCommentsTableTestHelper.cleanTable()
+    await UsersTableTestHelper.cleanTable()
+
+    const { id } = await UsersTableTestHelper.addUser()
+    userId = id
   })
 
   afterAll(async () => {
@@ -32,8 +39,17 @@ describe('ThreadCommentRepositoryPostgres', () => {
     })
 
     it('should throw data when found', async () => {
+      const currDate = new Date().toISOString()
+      const commentPayload = {
+        id: 'comment-1',
+        threadId: 'thread-1',
+        content: 'test',
+        userId: 'user-1',
+        createdAt: currDate
+      }
+
       // Arrange
-      await ThreadCommentsTableTestHelper.seed()
+      await ThreadCommentsTableTestHelper.seed(commentPayload)
       const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
 
       // Action & Assert
@@ -44,9 +60,13 @@ describe('ThreadCommentRepositoryPostgres', () => {
       expect(comments[0]).toHaveProperty('content')
       expect(comments[0]).toHaveProperty('username')
       expect(comments[0]).toHaveProperty('created_at')
-      expect(comments[0].id).toEqual('comment-1')
-      expect(comments[0].content).toEqual('test')
-      expect(comments[0].owner).toEqual('user-1')
+      expect(comments[0].id).toEqual(commentPayload.id)
+      expect(comments[0].content).toEqual(commentPayload.content)
+      expect(comments[0].owner).toEqual(commentPayload.userId)
+      expect(comments[0].date).toEqual(commentPayload.date)
+      expect(comments[0].thread).toEqual(commentPayload.threadId)
+      expect(comments[0].parent).toBeFalsy()
+      expect(comments[0].deleted_at).toBeFalsy()
     })
   })
 
@@ -63,8 +83,18 @@ describe('ThreadCommentRepositoryPostgres', () => {
     })
 
     it('should throw data when found', async () => {
+      const currDate = new Date().toISOString()
+      const replyPayload = {
+        id: 'comment-1',
+        commentId: 'comment-1',
+        threadId: 'thread-1',
+        content: 'test',
+        userId: 'user-1',
+        createdAt: currDate
+      }
+
       // Arrange
-      await ThreadCommentsTableTestHelper.reply()
+      await ThreadCommentsTableTestHelper.reply(replyPayload)
       const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
 
       // Action & Assert
@@ -75,9 +105,13 @@ describe('ThreadCommentRepositoryPostgres', () => {
       expect(comments[0]).toHaveProperty('content')
       expect(comments[0]).toHaveProperty('username')
       expect(comments[0]).toHaveProperty('created_at')
-      expect(comments[0].id).toEqual('comment-2')
-      expect(comments[0].content).toEqual('comment test reply')
-      expect(comments[0].owner).toEqual('user-1')
+      expect(comments[0].id).toEqual(replyPayload.id)
+      expect(comments[0].content).toEqual(replyPayload.content)
+      expect(comments[0].owner).toEqual(replyPayload.userId)
+      expect(comments[0].date).toEqual(replyPayload.date)
+      expect(comments[0].thread).toEqual(replyPayload.threadId)
+      expect(comments[0].parent).toEqual(replyPayload.commentId)
+      expect(comments[0].deleted_at).toBeFalsy()
     })
   })
 
@@ -96,6 +130,61 @@ describe('ThreadCommentRepositoryPostgres', () => {
       expect(comment.id).toEqual('comment-1')
       expect(comment.content).toEqual('test')
       expect(comment.owner).toEqual('user-1')
+    })
+  })
+
+  describe('checkAvailability function', () => {
+    it('should throw 404 when not found', async () => {
+      // Arrange
+      const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
+
+      // Action & Assert
+      const comment = threadCommentRepositoryPostgres.checkAvailability('comment-1')
+
+      await (expect(comment)).rejects.toThrow(new NotFoundError('komentar tidak ditemukan'))
+    })
+
+    it('should resolves true when found', async () => {
+      // Arrange
+      await ThreadCommentsTableTestHelper.seed()
+      const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
+
+      // Action & Assert
+      const isAvailable = threadCommentRepositoryPostgres.checkAvailability('comment-1')
+
+      await (expect(isAvailable)).resolves
+    })
+  })
+
+  describe('checkAccess function', () => {
+    it('should throw 403 when not owner', async () => {
+      // Arrange
+      await ThreadCommentsTableTestHelper.seed()
+      const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
+
+      // Action & Assert
+      const comment = threadCommentRepositoryPostgres.checkAccess({
+        commentId: 'comment-1',
+        userId: 'user-random'
+      })
+
+      await (expect(comment)).rejects.toThrow(new AuthorizationError('tidak dapat mengakses komentar'))
+    })
+
+    it('should resolves true when found', async () => {
+      // Arrange
+      await ThreadCommentsTableTestHelper.seed({
+        userId
+      })
+      const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
+
+      // Action & Assert
+      const isAvailable = threadCommentRepositoryPostgres.checkAccess({
+        commentId: 'comment-1',
+        userId
+      })
+
+      await (expect(isAvailable)).resolves
     })
   })
 

@@ -122,8 +122,6 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
     if (result.rows.length !== 1) {
       throw new NotFoundError('komentar tidak ditemukan')
     }
-
-    return true
   }
 
   async checkAccess ({
@@ -142,8 +140,6 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
     if (result.rows.length !== 1) {
       throw new AuthorizationError('tidak dapat mengakses komentar')
     }
-
-    return true
   }
 }
 

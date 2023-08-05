@@ -22,11 +22,11 @@ describe('ReplyThreadCommentUseCase', () => {
     mockThreadCommentRepository.checkAvailability = jest.fn()
       .mockImplementation((payload) => Promise.resolve(payload))
     mockThreadCommentRepository.reply = jest.fn()
-      .mockImplementation((payload) => Promise.resolve({
+      .mockImplementation((payload) => Promise.resolve(new CreatedThreadComment({
         id: 'comment-123',
         content: payload.content,
         owner: payload.owner
-      }))
+      })))
 
     // create use case instance
     const replyThreadCommentUseCase = new ReplyThreadCommentUseCase({
