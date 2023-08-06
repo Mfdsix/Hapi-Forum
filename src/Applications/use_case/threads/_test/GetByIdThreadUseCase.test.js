@@ -38,14 +38,22 @@ describe('GetByIdThreadUseCase', () => {
     const threadComment = {
       id: 'comment-1',
       content: 'comment content',
-      username: 'user-1',
-      created_at: currDate
+      thread: 'thread-1',
+      owner: 'user-1',
+      created_at: currDate,
+      parent: null,
+      deleted_at: null,
+      username: 'user app'
     }
     const threadCommentReply = {
-      id: 'comment-1',
+      id: 'comment-reply-1',
+      parent: 'comment-1',
+      thread: 'thread-1',
       content: 'comment content',
-      username: 'user-1',
-      created_at: currDate
+      owner: 'user-1',
+      username: 'user app',
+      created_at: currDate,
+      deleted_at: null
     }
 
     /** creating dependency of use case */
@@ -59,11 +67,17 @@ describe('GetByIdThreadUseCase', () => {
       .mockImplementation((id) => Promise.resolve())
     mockThreadCommentRepository.getByThreadId = jest.fn()
       .mockImplementation((id) => Promise.resolve([
-        threadComment
+        {
+          ...threadComment,
+          thread: id
+        }
       ]))
     mockThreadCommentRepository.getReplyByCommentId = jest.fn()
       .mockImplementation((id) => Promise.resolve([
-        threadCommentReply
+        {
+          ...threadCommentReply,
+          parent: id
+        }
       ]))
 
     // create use case instance
@@ -78,6 +92,7 @@ describe('GetByIdThreadUseCase', () => {
     const thread3 = await getByIdThreadUseCase.execute(mockAddedThreads[2].id)
 
     // Assert
+    expect(mockThreadRepository.checkAvailability).toBeCalledTimes(mockAddedThreads.length)
     expect(mockThreadRepository.getById).toBeCalledTimes(mockAddedThreads.length)
     expect(mockThreadCommentRepository.getByThreadId).toBeCalledTimes(mockAddedThreads.length)
     expect(mockThreadCommentRepository.getReplyByCommentId).toBeCalledTimes(mockAddedThreads.length)

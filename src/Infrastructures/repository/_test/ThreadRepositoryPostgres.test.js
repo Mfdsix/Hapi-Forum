@@ -97,7 +97,7 @@ describe('ThreadRepositoryPostgres', () => {
       // Action & Assert
       const thread = threadRepositoryPostgres.checkAvailability('thread-123')
 
-      await (expect(thread)).resolves
+      await (expect(thread)).resolves.not.toThrowError()
     })
   })
 
@@ -127,7 +127,7 @@ describe('ThreadRepositoryPostgres', () => {
         userId
       })
 
-      await (expect(thread)).resolves
+      await (expect(thread)).resolves.not.toThrowError()
     })
   })
 

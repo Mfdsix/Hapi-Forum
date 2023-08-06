@@ -12,14 +12,15 @@ const pool = require('../../database/postgres/pool')
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError')
 
 describe('ThreadCommentRepositoryPostgres', () => {
-  let userId
+  let userId, userName
 
   beforeEach(async () => {
     await ThreadCommentsTableTestHelper.cleanTable()
     await UsersTableTestHelper.cleanTable()
 
-    const { id } = await UsersTableTestHelper.addUser()
+    const { id, username } = await UsersTableTestHelper.addUser()
     userId = id
+    userName = username
   })
 
   afterAll(async () => {
@@ -117,8 +118,13 @@ describe('ThreadCommentRepositoryPostgres', () => {
 
   describe('getById function', () => {
     it('should throw data when found', async () => {
+      const currDate = new Date().toISOString()
+
       // Arrange
-      await ThreadCommentsTableTestHelper.seed()
+      await ThreadCommentsTableTestHelper.seed({
+        userId,
+        createdAt: currDate
+      })
       const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
 
       // Action & Assert
@@ -128,8 +134,13 @@ describe('ThreadCommentRepositoryPostgres', () => {
       expect(comment).toHaveProperty('content')
       expect(comment).toHaveProperty('username')
       expect(comment.id).toEqual('comment-1')
+      expect(comment.thread).toEqual('thread-1')
+      expect(comment.parent).toBeFalsy()
       expect(comment.content).toEqual('test')
-      expect(comment.owner).toEqual('user-1')
+      expect(comment.owner).toEqual(userId)
+      expect(comment.username).toEqual(userName)
+      expect(comment.created_at).toEqual(currDate)
+      expect(comment.deleted_at).toBeFalsy()
     })
   })
 

@@ -13,7 +13,7 @@ describe('DeleteByIdThreadUseCase', () => {
     // Mocking
     mockThreadRepository.checkAvailability = jest.fn()
       .mockImplementation((payload) => Promise.resolve())
-      mockThreadRepository.checkAccess = jest.fn()
+    mockThreadRepository.checkAccess = jest.fn()
       .mockImplementation((payload) => Promise.resolve())
     mockThreadRepository.deleteById = jest.fn()
       .mockImplementation(({ id }) => Promise.resolve({
