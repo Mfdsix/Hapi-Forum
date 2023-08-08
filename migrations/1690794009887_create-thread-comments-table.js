@@ -21,12 +21,13 @@ exports.up = pgm => {
       notNull: true
     },
     deleted_at: {
-      type: 'VARCHAR(25)',
+      type: 'timestamp',
       notNull: false
     },
     created_at: {
-      type: 'VARCHAR(25)',
-      notNull: true
+      type: 'timestamp',
+      notNull: true,
+      default: pgm.func('current_timestamp')
     }
   })
 }

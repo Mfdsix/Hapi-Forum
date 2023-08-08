@@ -54,13 +54,13 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
   async create (payload) {
     const { threadId, content, owner } = payload
     const id = `comment-${this._idGenerator()}`
-    const createdAt = new Date().toISOString()
+    // const createdAt = new Date().toISOString()
 
     const query = {
       text: `INSERT INTO thread_comments 
-      (id, thread, content, owner, created_at)
-      VALUES ($1, $2, $3, $4, $5) RETURNING id, content, owner`,
-      values: [id, threadId, content, owner, createdAt]
+      (id, thread, content, owner)
+      VALUES ($1, $2, $3, $4) RETURNING id, content, owner`,
+      values: [id, threadId, content, owner]
     }
     const result = await this._pool.query(query)
 
@@ -70,13 +70,13 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
   async reply (payload) {
     const { parentId, threadId, content, owner } = payload
     const id = `comment-${this._idGenerator()}`
-    const createdAt = new Date().toISOString()
+    // const createdAt = new Date().toISOString()
 
     const query = {
       text: `INSERT INTO thread_comments 
-      (id, thread, content, owner, created_at, parent)
-      VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, content, owner`,
-      values: [id, threadId, content, owner, createdAt, parentId]
+      (id, thread, content, owner, parent)
+      VALUES ($1, $2, $3, $4, $5) RETURNING id, content, owner`,
+      values: [id, threadId, content, owner, parentId]
     }
     const result = await this._pool.query(query)
 
