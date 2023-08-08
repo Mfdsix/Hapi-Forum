@@ -11,18 +11,17 @@ const createServer = require('../createServer')
 describe('/threads/{threadId}/comments endpoint', () => {
   let threadId
 
-  beforeAll(async () => {
+  beforeEach(async () => {
+    await ThreadCommentsTableTestHelper.cleanTable()
     await ThreadsTableTestHelper.cleanTable()
-    threadId = await ThreadsTableTestHelper.seed()
+    await UsersTableTestHelper.cleanTable()
+
+    const { id } = await ThreadsTableTestHelper.seed()
+    threadId = id
   })
 
   afterAll(async () => {
     await pool.end()
-  })
-
-  afterEach(async () => {
-    await ThreadCommentsTableTestHelper.cleanTable()
-    await UsersTableTestHelper.cleanTable()
   })
 
   describe('when POST /threads/{threadId}/comments', () => {
@@ -152,7 +151,9 @@ describe('/threads/{threadId}/comments endpoint', () => {
       const server = await createServer(container)
 
       // Action
-      const commentId = await ThreadCommentsTableTestHelper.seed(userId)
+      const commentId = await ThreadCommentsTableTestHelper.seed({
+        userId
+      })
       const response = await server.inject({
         method: 'POST',
         url: `/threads/${threadId}/comments/${commentId}/replies`,
@@ -270,9 +271,10 @@ describe('/threads/{threadId}/comments endpoint', () => {
       const server = await createServer(container)
 
       // Action
+      const commentId = await ThreadCommentsTableTestHelper.seed()
       const response = await server.inject({
         method: 'DELETE',
-        url: `/threads/${threadId}/comments/1/replies/2`,
+        url: `/threads/${threadId}/comments/${commentId}/replies/2`,
         headers: {
           Authorization: `Bearer ${accessToken}`
         }
@@ -285,17 +287,23 @@ describe('/threads/{threadId}/comments endpoint', () => {
     })
 
     it('should response 403 when not author of comment', async () => {
-      const { accessToken } = await AuthenticateTestHelper.createUserAndLogin('anotheruser')
+      const { userId } = await AuthenticateTestHelper.createUserAndLogin('user1')
+      const { accessToken: accessToken2 } = await AuthenticateTestHelper.createUserAndLogin('random')
       const server = await createServer(container)
 
       // Action
-      const commentId = await ThreadCommentsTableTestHelper.seed()
-      const replyId = await ThreadCommentsTableTestHelper.reply(commentId)
+      const commentId = await ThreadCommentsTableTestHelper.seed({
+        userId
+      })
+      const replyId = await ThreadCommentsTableTestHelper.reply({
+        commentId,
+        userId
+      })
       const response = await server.inject({
         method: 'DELETE',
         url: `/threads/${threadId}/comments/${commentId}/replies/${replyId}`,
         headers: {
-          Authorization: `Bearer ${accessToken}`
+          Authorization: `Bearer ${accessToken2}`
         }
       })
 
@@ -310,7 +318,9 @@ describe('/threads/{threadId}/comments endpoint', () => {
       const server = await createServer(container)
 
       // Action
-      const commentId = await ThreadCommentsTableTestHelper.seed(userId)
+      const commentId = await ThreadCommentsTableTestHelper.seed({
+        userId
+      })
       const replyId = await ThreadCommentsTableTestHelper.reply({
         commentId,
         userId

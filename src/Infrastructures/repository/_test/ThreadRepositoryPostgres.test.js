@@ -38,7 +38,7 @@ describe('ThreadRepositoryPostgres', () => {
 
     it('should throw data when found', async () => {
       // Arrange
-      await ThreadsTableTestHelper.seed()
+      const { id } = await ThreadsTableTestHelper.seed(userId)
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {})
 
       // Action & Assert
@@ -48,9 +48,9 @@ describe('ThreadRepositoryPostgres', () => {
       expect(threads[0]).toHaveProperty('id')
       expect(threads[0]).toHaveProperty('title')
       expect(threads[0]).toHaveProperty('owner')
-      expect(threads[0].id).toEqual('thread-123')
+      expect(threads[0].id).toEqual(id)
       expect(threads[0].title).toEqual('test')
-      expect(threads[0].owner).toEqual('owner-1')
+      expect(threads[0].owner).toEqual(userId)
     })
   })
 
@@ -137,7 +137,7 @@ describe('ThreadRepositoryPostgres', () => {
       const createThread = new CreateThread({
         title: 'test',
         body: 'body of test',
-        owner: 'owner-1'
+        owner: userId
       })
       const fakeIdGenerator = () => '123' // stub!
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator)
@@ -169,21 +169,21 @@ describe('ThreadRepositoryPostgres', () => {
   describe('updateById function', () => {
     it('should update thread by id correctly', async () => {
       // Arrange
-      await ThreadsTableTestHelper.seed()
+      const { id } = await ThreadsTableTestHelper.seed(userId)
       const updateThread = {
-        id: 'thread-123',
+        id,
         title: 'updated test',
         body: 'updated body of test',
-        userId: 'owner-1'
+        userId
       }
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {})
 
       // Action
       const updated = await threadRepositoryPostgres.updateById(updateThread)
-      const getOne = await threadRepositoryPostgres.getById('thread-123')
+      const getOne = await threadRepositoryPostgres.getById(id)
 
       // Assert
-      expect(updated).toEqual('thread-123')
+      expect(updated).toEqual(id)
       expect(getOne.title).toEqual(updateThread.title)
       expect(getOne.body).toEqual(updateThread.body)
     })
@@ -192,13 +192,13 @@ describe('ThreadRepositoryPostgres', () => {
   describe('deleteById function', () => {
     it('should delete thread by id correctly', async () => {
       // Arrange
-      await ThreadsTableTestHelper.seed()
+      const { id } = await ThreadsTableTestHelper.seed(userId)
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {})
 
       // Action
       const deleted = await threadRepositoryPostgres.deleteById({
-        id: 'thread-123',
-        userId: 'owner-1'
+        id,
+        userId
       })
       const check = threadRepositoryPostgres.checkAvailability('thread-123')
 

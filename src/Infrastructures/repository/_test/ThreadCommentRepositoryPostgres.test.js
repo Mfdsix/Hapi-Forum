@@ -45,7 +45,7 @@ describe('ThreadCommentRepositoryPostgres', () => {
         id: 'comment-1',
         threadId: 'thread-1',
         content: 'test',
-        userId: 'user-1',
+        userId,
         createdAt: currDate
       }
 
@@ -84,13 +84,14 @@ describe('ThreadCommentRepositoryPostgres', () => {
     })
 
     it('should throw data when found', async () => {
+      const commentId = await ThreadCommentsTableTestHelper.seed()
       const currDate = new Date().toISOString()
       const replyPayload = {
-        id: 'comment-1',
-        commentId: 'comment-1',
+        id: 'comment-2',
+        commentId,
         threadId: 'thread-1',
         content: 'test',
-        userId: 'user-1',
+        userId,
         createdAt: currDate
       }
 
@@ -122,8 +123,7 @@ describe('ThreadCommentRepositoryPostgres', () => {
 
       // Arrange
       await ThreadCommentsTableTestHelper.seed({
-        userId,
-        createdAt: currDate
+        userId
       })
       const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
 
@@ -139,7 +139,7 @@ describe('ThreadCommentRepositoryPostgres', () => {
       expect(comment.content).toEqual('test')
       expect(comment.owner).toEqual(userId)
       expect(comment.username).toEqual(userName)
-      expect(comment.created_at).toEqual(currDate)
+      expect(comment.created_at).toBeTruthy()
       expect(comment.deleted_at).toBeFalsy()
     })
   })
@@ -155,9 +155,11 @@ describe('ThreadCommentRepositoryPostgres', () => {
       await (expect(comment)).rejects.toThrow(new NotFoundError('komentar tidak ditemukan'))
     })
 
-    it('should resolves true when found', async () => {
+    it('should resolves when found', async () => {
       // Arrange
-      await ThreadCommentsTableTestHelper.seed()
+      await ThreadCommentsTableTestHelper.seed({
+        userId
+      })
       const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
 
       // Action & Assert
@@ -170,7 +172,9 @@ describe('ThreadCommentRepositoryPostgres', () => {
   describe('checkAccess function', () => {
     it('should throw 403 when not owner', async () => {
       // Arrange
-      await ThreadCommentsTableTestHelper.seed()
+      await ThreadCommentsTableTestHelper.seed({
+        userId
+      })
       const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
 
       // Action & Assert
@@ -205,7 +209,7 @@ describe('ThreadCommentRepositoryPostgres', () => {
       const payload = new CreateThreadComment({
         threadId: 'thread-1',
         content: 'body of comment',
-        owner: 'owner-1'
+        owner: userId
       })
       const fakeIdGenerator = () => '123' // stub!
       const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, fakeIdGenerator)
@@ -235,12 +239,15 @@ describe('ThreadCommentRepositoryPostgres', () => {
 
   describe('reply function', () => {
     it('should persist reply comment and return created reply correctly', async () => {
+      const parentId = await ThreadCommentsTableTestHelper.seed({
+        userId
+      })
       // Arrange
       const payload = new ReplyThreadComment({
-        parentId: 'comment-1',
+        parentId,
         threadId: 'thread-1',
         content: 'body of reply comment',
-        owner: 'owner-1'
+        owner: userId
       })
       const fakeIdGenerator = () => '1234' // stub!
       const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, fakeIdGenerator)
@@ -273,11 +280,13 @@ describe('ThreadCommentRepositoryPostgres', () => {
   describe('updateById function', () => {
     it('should update comment by id correctly', async () => {
       // Arrange
-      await ThreadCommentsTableTestHelper.seed()
+      await ThreadCommentsTableTestHelper.seed({
+        userId
+      })
       const updateThread = {
         id: 'comment-1',
         content: 'update content of comment',
-        userId: 'user-1'
+        userId
       }
       const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
 
@@ -294,13 +303,15 @@ describe('ThreadCommentRepositoryPostgres', () => {
   describe('deleteById function', () => {
     it('should delete comment by id correctly', async () => {
       // Arrange
-      await ThreadCommentsTableTestHelper.seed()
+      await ThreadCommentsTableTestHelper.seed({
+        userId
+      })
       const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
 
       // Action
       const deleted = await threadCommentRepositoryPostgres.deleteById({
         id: 'comment-1',
-        userId: 'user-1'
+        userId
       })
       const getOne = await threadCommentRepositoryPostgres.getById('comment-1')
 

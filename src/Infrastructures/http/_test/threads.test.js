@@ -242,7 +242,7 @@ describe('/threads endpoint', () => {
       const { accessToken } = await AuthenticateTestHelper.createUserAndLogin()
 
       // Action
-      const threadId = await ThreadsTableTestHelper.seed()
+      const {id:threadId} = await ThreadsTableTestHelper.seed()
       const response = await server.inject({
         method: 'PUT',
         url: `/threads/${threadId}`,
@@ -267,7 +267,7 @@ describe('/threads endpoint', () => {
       const { accessToken, userId } = await AuthenticateTestHelper.createUserAndLogin()
 
       // Action
-      const threadId = await ThreadsTableTestHelper.seed(userId)
+      const {id: threadId} = await ThreadsTableTestHelper.seed(userId)
       const response = await server.inject({
         method: 'PUT',
         url: `/threads/${threadId}`,
@@ -326,7 +326,7 @@ describe('/threads endpoint', () => {
       const { accessToken } = await AuthenticateTestHelper.createUserAndLogin()
 
       // Action
-      const threadId = await ThreadsTableTestHelper.seed()
+      const {id:threadId} = await ThreadsTableTestHelper.seed()
       const response = await server.inject({
         method: 'DELETE',
         url: `/threads/${threadId}`,
@@ -341,12 +341,12 @@ describe('/threads endpoint', () => {
       expect(responseJson.status).toEqual('fail')
     })
 
-    it('should response 200 when not owner', async () => {
+    it('should response 200 when ok', async () => {
       const server = await createServer(container)
       const { accessToken, userId } = await AuthenticateTestHelper.createUserAndLogin()
 
       // Action
-      const threadId = await ThreadsTableTestHelper.seed(userId)
+      const { id: threadId } = await ThreadsTableTestHelper.seed(userId)
       const response = await server.inject({
         method: 'DELETE',
         url: `/threads/${threadId}`,
