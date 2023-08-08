@@ -32,6 +32,7 @@
     "eslint": "^8.45.0",
     "eslint-config-standard": "^15.0.0",
     "eslint-plugin-import": "^2.28.0",
+    "eslint-plugin-jest": "^27.2.3",
     "jest": "^27.0.6",
     "node-pg-migrate": "^5.10.0",
     "nodemon": "^2.0.9"

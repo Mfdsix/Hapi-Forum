@@ -4,7 +4,6 @@ const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper')
 const AuthenticateTestHelper = require('../../../../tests/AuthenticateTestHelper')
 const container = require('../../container')
 const createServer = require('../createServer')
-const { headers } = require('@hapi/hapi/lib/cors')
 
 describe('/threads endpoint', () => {
   afterAll(async () => {

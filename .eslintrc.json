@@ -3,12 +3,14 @@
         "browser": true,
         "commonjs": true,
         "es2021": true,
-        "node": true
+        "node": true,
+        "jest/globals": true
     },
     "extends": "standard",
     "parserOptions": {
         "ecmaVersion": "latest"
     },
+    "plugins": ["jest"],
     "rules": {
         "semi": 1,
         "no-console": 1,
