@@ -131,7 +131,9 @@ describe('/threads/{threadId}/comments endpoint', () => {
       const server = await createServer(container)
 
       // Action
-      const commentId = await ThreadCommentsTableTestHelper.seed()
+      const commentId = await ThreadCommentsTableTestHelper.seed({
+        threadId
+      })
       const response = await server.inject({
         method: 'POST',
         url: `/threads/${threadId}/comments/${commentId}/replies`,
@@ -212,7 +214,9 @@ describe('/threads/{threadId}/comments endpoint', () => {
       const server = await createServer(container)
 
       // Action
-      const commentId = await ThreadCommentsTableTestHelper.seed()
+      const commentId = await ThreadCommentsTableTestHelper.seed({
+        threadId
+      })
       const response = await server.inject({
         method: 'DELETE',
         url: `/threads/${threadId}/comments/${commentId}`,
@@ -233,7 +237,8 @@ describe('/threads/{threadId}/comments endpoint', () => {
 
       // Action
       const commentId = await ThreadCommentsTableTestHelper.seed({
-        userId
+        userId,
+        threadId
       })
       const response = await server.inject({
         method: 'DELETE',
@@ -271,7 +276,9 @@ describe('/threads/{threadId}/comments endpoint', () => {
       const server = await createServer(container)
 
       // Action
-      const commentId = await ThreadCommentsTableTestHelper.seed()
+      const commentId = await ThreadCommentsTableTestHelper.seed({
+        threadId
+      })
       const response = await server.inject({
         method: 'DELETE',
         url: `/threads/${threadId}/comments/${commentId}/replies/2`,
@@ -293,11 +300,13 @@ describe('/threads/{threadId}/comments endpoint', () => {
 
       // Action
       const commentId = await ThreadCommentsTableTestHelper.seed({
-        userId
+        userId,
+        threadId
       })
       const replyId = await ThreadCommentsTableTestHelper.reply({
         commentId,
-        userId
+        userId,
+        threadId
       })
       const response = await server.inject({
         method: 'DELETE',
@@ -319,11 +328,13 @@ describe('/threads/{threadId}/comments endpoint', () => {
 
       // Action
       const commentId = await ThreadCommentsTableTestHelper.seed({
-        userId
+        userId,
+        threadId
       })
       const replyId = await ThreadCommentsTableTestHelper.reply({
         commentId,
-        userId
+        userId,
+        threadId
       })
       const response = await server.inject({
         method: 'DELETE',

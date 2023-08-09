@@ -1,5 +1,6 @@
 const ThreadCommentsTableTestHelper = require('../../../../tests/ThreadCommentsTableTestHelper')
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper')
+const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper')
 
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError')
 
@@ -12,15 +13,19 @@ const pool = require('../../database/postgres/pool')
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError')
 
 describe('ThreadCommentRepositoryPostgres', () => {
-  let userId, userName
+  let userId, userName, threadId
 
   beforeEach(async () => {
     await ThreadCommentsTableTestHelper.cleanTable()
+    await ThreadsTableTestHelper.cleanTable()
     await UsersTableTestHelper.cleanTable()
 
     const { id, username } = await UsersTableTestHelper.addUser()
     userId = id
     userName = username
+
+    const { id: threadid } = await ThreadsTableTestHelper.seed(userId)
+    threadId = threadid
   })
 
   afterAll(async () => {
@@ -43,7 +48,7 @@ describe('ThreadCommentRepositoryPostgres', () => {
       const currDate = new Date().toISOString()
       const commentPayload = {
         id: 'comment-1',
-        threadId: 'thread-1',
+        threadId,
         content: 'test',
         userId,
         createdAt: currDate
@@ -54,7 +59,7 @@ describe('ThreadCommentRepositoryPostgres', () => {
       const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
 
       // Action & Assert
-      const comments = await threadCommentRepositoryPostgres.getByThreadId('thread-1')
+      const comments = await threadCommentRepositoryPostgres.getByThreadId(threadId)
 
       expect(comments.length).toEqual(1)
       expect(comments[0]).toHaveProperty('id')
@@ -84,12 +89,15 @@ describe('ThreadCommentRepositoryPostgres', () => {
     })
 
     it('should throw data when found', async () => {
-      const commentId = await ThreadCommentsTableTestHelper.seed()
+      const commentId = await ThreadCommentsTableTestHelper.seed({
+        threadId,
+        userId
+      })
       const currDate = new Date().toISOString()
       const replyPayload = {
         id: 'comment-2',
         commentId,
-        threadId: 'thread-1',
+        threadId,
         content: 'test',
         userId,
         createdAt: currDate
@@ -119,11 +127,10 @@ describe('ThreadCommentRepositoryPostgres', () => {
 
   describe('getById function', () => {
     it('should throw data when found', async () => {
-      const currDate = new Date().toISOString()
-
       // Arrange
       await ThreadCommentsTableTestHelper.seed({
-        userId
+        userId,
+        threadId
       })
       const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
 
@@ -134,7 +141,7 @@ describe('ThreadCommentRepositoryPostgres', () => {
       expect(comment).toHaveProperty('content')
       expect(comment).toHaveProperty('username')
       expect(comment.id).toEqual('comment-1')
-      expect(comment.thread).toEqual('thread-1')
+      expect(comment.thread).toEqual(threadId)
       expect(comment.parent).toBeFalsy()
       expect(comment.content).toEqual('test')
       expect(comment.owner).toEqual(userId)
@@ -158,7 +165,8 @@ describe('ThreadCommentRepositoryPostgres', () => {
     it('should resolves when found', async () => {
       // Arrange
       await ThreadCommentsTableTestHelper.seed({
-        userId
+        userId,
+        threadId
       })
       const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
 
@@ -173,7 +181,8 @@ describe('ThreadCommentRepositoryPostgres', () => {
     it('should throw 403 when not owner', async () => {
       // Arrange
       await ThreadCommentsTableTestHelper.seed({
-        userId
+        userId,
+        threadId
       })
       const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
 
@@ -189,7 +198,8 @@ describe('ThreadCommentRepositoryPostgres', () => {
     it('should resolves true when found', async () => {
       // Arrange
       await ThreadCommentsTableTestHelper.seed({
-        userId
+        userId,
+        threadId
       })
       const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
 
@@ -207,7 +217,7 @@ describe('ThreadCommentRepositoryPostgres', () => {
     it('should persist create comment and return created comment correctly', async () => {
       // Arrange
       const payload = new CreateThreadComment({
-        threadId: 'thread-1',
+        threadId,
         content: 'body of comment',
         owner: userId
       })
@@ -240,12 +250,13 @@ describe('ThreadCommentRepositoryPostgres', () => {
   describe('reply function', () => {
     it('should persist reply comment and return created reply correctly', async () => {
       const parentId = await ThreadCommentsTableTestHelper.seed({
-        userId
+        userId,
+        threadId
       })
       // Arrange
       const payload = new ReplyThreadComment({
         parentId,
-        threadId: 'thread-1',
+        threadId,
         content: 'body of reply comment',
         owner: userId
       })
@@ -281,6 +292,7 @@ describe('ThreadCommentRepositoryPostgres', () => {
     it('should update comment by id correctly', async () => {
       // Arrange
       await ThreadCommentsTableTestHelper.seed({
+        threadId,
         userId
       })
       const updateThread = {
@@ -304,7 +316,8 @@ describe('ThreadCommentRepositoryPostgres', () => {
     it('should delete comment by id correctly', async () => {
       // Arrange
       await ThreadCommentsTableTestHelper.seed({
-        userId
+        userId,
+        threadId
       })
       const threadCommentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {})
 

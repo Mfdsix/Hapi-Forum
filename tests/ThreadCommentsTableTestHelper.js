@@ -55,7 +55,7 @@ const ThreadCommentsTableTestHelper = {
   },
 
   async cleanTable () {
-    await pool.query('TRUNCATE TABLE thread_comments')
+    await pool.query('DELETE FROM thread_comments')
   }
 }
 

@@ -8,7 +8,7 @@ describe('/users endpoint', () => {
     await pool.end()
   })
 
-  afterEach(async () => {
+  beforeEach(async () => {
     await UsersTableTestHelper.cleanTable()
   })
 
