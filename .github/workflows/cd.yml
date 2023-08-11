@@ -19,7 +19,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             sudo su
-            cd ~/Hapi-Forum
+            cd /root/Hapi-Forum
             git pull origin main
             npm install
             npm run migrate up
