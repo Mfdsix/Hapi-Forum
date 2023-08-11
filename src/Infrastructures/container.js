@@ -15,10 +15,12 @@ const BcryptPasswordHash = require('./security/BcryptPasswordHash')
 const UserRepositoryPostgres = require('./repository/UserRepositoryPostgres')
 const ThreadRepositoryPostgres = require('./repository/ThreadRepositoryPostgres')
 const ThreadCommentRepositoryPostgres = require('./repository/ThreadCommentRepositoryPostgres')
+const ThreadCommentLikeRepositoryPostgres = require('./repository/ThreadCommentLikeRepositoryPostgres')
 
 const UserRepository = require('../Domains/users/UserRepository')
 const ThreadRepository = require('../Domains/threads/ThreadRepository')
 const ThreadCommentRepository = require('../Domains/thread-comments/ThreadCommentRepository')
+const ThreadCommentLikeRepository = require('../Domains/thread-comment-likes/ThreadCommentLikeRepository')
 
 // use case
 const AddUserUseCase = require('../Applications/use_case/users/AddUserUseCase')
@@ -40,6 +42,8 @@ const CreateThreadCommentUseCase = require('../Applications/use_case/thread-comm
 const ReplyThreadCommentUseCase = require('../Applications/use_case/thread-comments/ReplyThreadCommentUseCase')
 const UpdateThreadCommentUseCase = require('../Applications/use_case/thread-comments/UpdateThreadCommentUseCase')
 const DeleteThreadCommentUseCase = require('../Applications/use_case/thread-comments/DeleteThreadCommentUseCase')
+
+const ToggleThreadCommentUseCase = require('../Applications/use_case/thread-comment-likes/ToggleThreadCommentUseCase')
 
 // creating container
 const container = createContainer()
@@ -88,6 +92,20 @@ container.register([
   {
     key: ThreadCommentRepository.name,
     Class: ThreadCommentRepositoryPostgres,
+    parameter: {
+      dependencies: [
+        {
+          concrete: pool
+        },
+        {
+          concrete: nanoid
+        }
+      ]
+    }
+  },
+  {
+    key: ThreadCommentLikeRepository.name,
+    Class: ThreadCommentLikeRepositoryPostgres,
     parameter: {
       dependencies: [
         {
@@ -224,6 +242,10 @@ container.register([
         {
           name: 'threadCommentRepository',
           internal: ThreadCommentRepository.name
+        },
+        {
+          name: 'threadCommentLikeRepository',
+          internal: ThreadCommentLikeRepository.name
         }
       ]
     }
@@ -331,6 +353,27 @@ container.register([
         {
           name: 'threadCommentRepository',
           internal: ThreadCommentRepository.name
+        }
+      ]
+    }
+  },
+  {
+    key: ToggleThreadCommentUseCase.name,
+    Class: ToggleThreadCommentUseCase,
+    parameter: {
+      injectType: 'destructuring',
+      dependencies: [
+        {
+          name: 'threadRepository',
+          internal: ThreadRepository.name
+        },
+        {
+          name: 'threadCommentRepository',
+          internal: ThreadCommentRepository.name
+        },
+        {
+          name: 'threadCommentLikeRepository',
+          internal: ThreadCommentLikeRepository.name
         }
       ]
     }

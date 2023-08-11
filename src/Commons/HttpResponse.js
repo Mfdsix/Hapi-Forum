@@ -1,8 +1,10 @@
 const HttpResponse = {
-  success ({
-    data = undefined,
-    message = undefined
-  }) {
+  success (response = {}) {
+    const {
+      data = undefined,
+      message = undefined
+    } = response
+
     return {
       status: 'success',
       data,
