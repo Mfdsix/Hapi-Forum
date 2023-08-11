@@ -1,3 +1,4 @@
+const ToggleThreadCommentLikeUseCase = require('../../../../Applications/use_case/thread-comment-likes/ToggleThreadCommentUseCase')
 const HttpResponse = require('../../../../Commons/HttpResponse')
 const autoBind = require('auto-bind')
 

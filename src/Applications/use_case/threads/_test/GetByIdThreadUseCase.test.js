@@ -1,5 +1,7 @@
 const ThreadRepository = require('../../../../Domains/threads/ThreadRepository')
 const ThreadCommentRepository = require('../../../../Domains/thread-comments/ThreadCommentRepository')
+const ThreadCommentLikeRepository = require('../../../../Domains/thread-comment-likes/ThreadCommentLikeRepository')
+
 const GetByIdThreadUseCase = require('../GetByIdThreadUseCase')
 
 describe('GetByIdThreadUseCase', () => {
@@ -41,6 +43,7 @@ describe('GetByIdThreadUseCase', () => {
       thread: 'thread-1',
       owner: 'user-1',
       created_at: currDate,
+      likes: 1,
       parent: null,
       deleted_at: null,
       username: 'user app'
@@ -53,18 +56,24 @@ describe('GetByIdThreadUseCase', () => {
       owner: 'user-1',
       username: 'user app',
       created_at: currDate,
+      likes: 1,
       deleted_at: null
     }
 
     /** creating dependency of use case */
     const mockThreadRepository = new ThreadRepository()
     const mockThreadCommentRepository = new ThreadCommentRepository()
+    const mockThreadCommentLikeRepository = new ThreadCommentLikeRepository()
 
     /** mocking needed function */
     mockThreadRepository.getById = jest.fn()
       .mockImplementation((id) => Promise.resolve(mockAddedThreads.filter((thread) => thread.id === id)[0]))
     mockThreadRepository.checkAvailability = jest.fn()
       .mockImplementation((id) => Promise.resolve())
+
+    mockThreadCommentLikeRepository.countByCommentId = jest.fn()
+      .mockImplementation((commentId) => Promise.resolve())
+
     mockThreadCommentRepository.getByThreadId = jest.fn()
       .mockImplementation((id) => Promise.resolve([
         {
@@ -83,7 +92,8 @@ describe('GetByIdThreadUseCase', () => {
     // create use case instance
     const getByIdThreadUseCase = new GetByIdThreadUseCase({
       threadRepository: mockThreadRepository,
-      threadCommentRepository: mockThreadCommentRepository
+      threadCommentRepository: mockThreadCommentRepository,
+      threadCommentLikeRepository: mockThreadCommentLikeRepository
     })
 
     // Action
@@ -139,58 +149,70 @@ describe('GetByIdThreadUseCase', () => {
     expect(thread1.comments[0]).toHaveProperty('content')
     expect(thread1.comments[0]).toHaveProperty('username')
     expect(thread1.comments[0]).toHaveProperty('date')
+    expect(thread1.comments[0]).toHaveProperty('likeCount')
     expect(thread1.comments[0].id).toEqual(threadComment.id)
     expect(thread1.comments[0].content).toEqual(threadComment.content)
     expect(thread1.comments[0].username).toEqual(threadComment.username)
     expect(thread1.comments[0].date).toEqual(threadComment.created_at)
+    expect(thread1.comments[0].likeCount).toEqual(0)
 
     expect(thread1.comments[0].replies.length).toEqual(1)
     expect(thread1.comments[0].replies[0]).toHaveProperty('id')
     expect(thread1.comments[0].replies[0]).toHaveProperty('content')
     expect(thread1.comments[0].replies[0]).toHaveProperty('username')
     expect(thread1.comments[0].replies[0]).toHaveProperty('date')
+    expect(thread1.comments[0].replies[0]).toHaveProperty('likeCount')
     expect(thread1.comments[0].replies[0].id).toEqual(threadCommentReply.id)
     expect(thread1.comments[0].replies[0].content).toEqual(threadCommentReply.content)
     expect(thread1.comments[0].replies[0].username).toEqual(threadCommentReply.username)
     expect(thread1.comments[0].replies[0].date).toEqual(threadCommentReply.created_at)
+    expect(thread1.comments[0].replies[0].likeCount).toEqual(0)
 
     expect(thread2.comments[0]).toHaveProperty('id')
     expect(thread2.comments[0]).toHaveProperty('content')
     expect(thread2.comments[0]).toHaveProperty('username')
     expect(thread2.comments[0]).toHaveProperty('date')
+    expect(thread2.comments[0]).toHaveProperty('likeCount')
     expect(thread2.comments[0].id).toEqual(threadComment.id)
     expect(thread2.comments[0].content).toEqual(threadComment.content)
     expect(thread2.comments[0].username).toEqual(threadComment.username)
     expect(thread2.comments[0].date).toEqual(threadComment.created_at)
+    expect(thread2.comments[0].likeCount).toEqual(0)
 
     expect(thread2.comments[0].replies.length).toEqual(1)
     expect(thread2.comments[0].replies[0]).toHaveProperty('id')
     expect(thread2.comments[0].replies[0]).toHaveProperty('content')
     expect(thread2.comments[0].replies[0]).toHaveProperty('username')
     expect(thread2.comments[0].replies[0]).toHaveProperty('date')
+    expect(thread2.comments[0].replies[0]).toHaveProperty('likeCount')
     expect(thread2.comments[0].replies[0].id).toEqual(threadCommentReply.id)
     expect(thread2.comments[0].replies[0].content).toEqual(threadCommentReply.content)
     expect(thread2.comments[0].replies[0].username).toEqual(threadCommentReply.username)
     expect(thread2.comments[0].replies[0].date).toEqual(threadCommentReply.created_at)
+    expect(thread2.comments[0].replies[0].likeCount).toEqual(0)
 
     expect(thread3.comments[0]).toHaveProperty('id')
     expect(thread3.comments[0]).toHaveProperty('content')
     expect(thread3.comments[0]).toHaveProperty('username')
     expect(thread3.comments[0]).toHaveProperty('date')
+    expect(thread3.comments[0]).toHaveProperty('likeCount')
     expect(thread3.comments[0].id).toEqual(threadComment.id)
     expect(thread3.comments[0].content).toEqual(threadComment.content)
     expect(thread3.comments[0].username).toEqual(threadComment.username)
     expect(thread3.comments[0].date).toEqual(threadComment.created_at)
+    expect(thread3.comments[0].likeCount).toEqual(0)
 
     expect(thread3.comments[0].replies.length).toEqual(1)
     expect(thread3.comments[0].replies[0]).toHaveProperty('id')
     expect(thread3.comments[0].replies[0]).toHaveProperty('content')
     expect(thread3.comments[0].replies[0]).toHaveProperty('username')
     expect(thread3.comments[0].replies[0]).toHaveProperty('date')
+    expect(thread3.comments[0].replies[0]).toHaveProperty('likeCount')
     expect(thread3.comments[0].replies[0].id).toEqual(threadCommentReply.id)
     expect(thread3.comments[0].replies[0].content).toEqual(threadCommentReply.content)
     expect(thread3.comments[0].replies[0].username).toEqual(threadCommentReply.username)
     expect(thread3.comments[0].replies[0].date).toEqual(threadCommentReply.created_at)
+    expect(thread3.comments[0].replies[0].likeCount).toEqual(0)
   })
 
   it('should return correct transformed thread data', async () => {
@@ -206,6 +228,7 @@ describe('GetByIdThreadUseCase', () => {
     /** creating dependency of use case */
     const mockThreadRepository = new ThreadRepository()
     const mockThreadCommentRepository = new ThreadCommentRepository()
+    const mockThreadCommentLikeRepository = new ThreadCommentLikeRepository()
 
     /** mocking needed function */
     mockThreadRepository.getById = jest.fn()
@@ -214,11 +237,14 @@ describe('GetByIdThreadUseCase', () => {
       .mockImplementation((id) => Promise.resolve())
     mockThreadCommentRepository.getReplyByCommentId = jest.fn()
       .mockImplementation((id) => Promise.resolve())
+    mockThreadCommentLikeRepository.countByCommentId = jest.fn()
+      .mockImplementation((commentId) => Promise.resolve(1))
 
     // create use case instance
     const getByIdThreadUseCase = new GetByIdThreadUseCase({
       threadRepository: mockThreadRepository,
-      threadCommentRepository: mockThreadCommentRepository
+      threadCommentRepository: mockThreadCommentRepository,
+      threadCommentLikeRepository: mockThreadCommentLikeRepository
     })
 
     // Action
@@ -244,6 +270,7 @@ describe('GetByIdThreadUseCase', () => {
       content: 'comment',
       username: 'user1',
       created_at: currDate,
+      likes: 1,
       parent: null,
       deleted_at: null
     }
@@ -251,6 +278,7 @@ describe('GetByIdThreadUseCase', () => {
     /** creating dependency of use case */
     const mockThreadRepository = new ThreadRepository()
     const mockThreadCommentRepository = new ThreadCommentRepository()
+    const mockThreadCommentLikeRepository = new ThreadCommentLikeRepository()
 
     /** mocking needed function */
     mockThreadRepository.getById = jest.fn()
@@ -259,11 +287,14 @@ describe('GetByIdThreadUseCase', () => {
       .mockImplementation((id) => Promise.resolve())
     mockThreadCommentRepository.getReplyByCommentId = jest.fn()
       .mockImplementation((id) => Promise.resolve())
+    mockThreadCommentLikeRepository.countByCommentId = jest.fn()
+      .mockImplementation((commentId) => Promise.resolve(1))
 
     // create use case instance
     const getByIdThreadUseCase = new GetByIdThreadUseCase({
       threadRepository: mockThreadRepository,
-      threadCommentRepository: mockThreadCommentRepository
+      threadCommentRepository: mockThreadCommentRepository,
+      threadCommentLikeRepository: mockThreadCommentLikeRepository
     })
 
     // Action
@@ -274,10 +305,12 @@ describe('GetByIdThreadUseCase', () => {
     expect(transformed).toHaveProperty('content')
     expect(transformed).toHaveProperty('username')
     expect(transformed).toHaveProperty('date')
+    expect(transformed).toHaveProperty('likeCount')
     expect(transformed.id).toEqual(commentData.id)
     expect(transformed.content).toEqual(commentData.content)
     expect(transformed.username).toEqual(commentData.username)
     expect(transformed.date).toEqual(commentData.created_at)
+    expect(transformed.likeCount).toEqual(1)
   })
 
   it('should return plain comment when have parent and not deleted', async () => {
@@ -287,6 +320,7 @@ describe('GetByIdThreadUseCase', () => {
       content: 'comment',
       username: 'user1',
       created_at: currDate,
+      likes: 1,
       parent: 'comment-parent-1',
       deleted_at: null
     }
@@ -294,6 +328,7 @@ describe('GetByIdThreadUseCase', () => {
     /** creating dependency of use case */
     const mockThreadRepository = new ThreadRepository()
     const mockThreadCommentRepository = new ThreadCommentRepository()
+    const mockThreadCommentLikeRepository = new ThreadCommentLikeRepository()
 
     /** mocking needed function */
     mockThreadRepository.getById = jest.fn()
@@ -302,11 +337,14 @@ describe('GetByIdThreadUseCase', () => {
       .mockImplementation((id) => Promise.resolve())
     mockThreadCommentRepository.getReplyByCommentId = jest.fn()
       .mockImplementation((id) => Promise.resolve())
+    mockThreadCommentLikeRepository.countByCommentId = jest.fn()
+      .mockImplementation((commentId) => Promise.resolve(1))
 
     // create use case instance
     const getByIdThreadUseCase = new GetByIdThreadUseCase({
       threadRepository: mockThreadRepository,
-      threadCommentRepository: mockThreadCommentRepository
+      threadCommentRepository: mockThreadCommentRepository,
+      threadCommentLikeRepository: mockThreadCommentLikeRepository
     })
 
     // Action
@@ -317,10 +355,12 @@ describe('GetByIdThreadUseCase', () => {
     expect(transformed).toHaveProperty('content')
     expect(transformed).toHaveProperty('username')
     expect(transformed).toHaveProperty('date')
+    expect(transformed).toHaveProperty('likeCount')
     expect(transformed.id).toEqual(commentData.id)
     expect(transformed.content).toEqual(commentData.content)
     expect(transformed.username).toEqual(commentData.username)
     expect(transformed.date).toEqual(commentData.created_at)
+    expect(transformed.likeCount).toEqual(1)
   })
 
   it('should return **komentar telah dihapus** when not have parent and deleted', async () => {
@@ -330,6 +370,7 @@ describe('GetByIdThreadUseCase', () => {
       content: 'comment',
       username: 'user1',
       created_at: currDate,
+      likes: 1,
       parent: null,
       deleted_at: currDate
     }
@@ -337,6 +378,7 @@ describe('GetByIdThreadUseCase', () => {
     /** creating dependency of use case */
     const mockThreadRepository = new ThreadRepository()
     const mockThreadCommentRepository = new ThreadCommentRepository()
+    const mockThreadCommentLikeRepository = new ThreadCommentLikeRepository()
 
     /** mocking needed function */
     mockThreadRepository.getById = jest.fn()
@@ -345,11 +387,14 @@ describe('GetByIdThreadUseCase', () => {
       .mockImplementation((id) => Promise.resolve())
     mockThreadCommentRepository.getReplyByCommentId = jest.fn()
       .mockImplementation((id) => Promise.resolve())
+    mockThreadCommentLikeRepository.countByCommentId = jest.fn()
+      .mockImplementation((commentId) => Promise.resolve(1))
 
     // create use case instance
     const getByIdThreadUseCase = new GetByIdThreadUseCase({
       threadRepository: mockThreadRepository,
-      threadCommentRepository: mockThreadCommentRepository
+      threadCommentRepository: mockThreadCommentRepository,
+      threadCommentLikeRepository: mockThreadCommentLikeRepository
     })
 
     // Action
@@ -360,10 +405,12 @@ describe('GetByIdThreadUseCase', () => {
     expect(transformed).toHaveProperty('content')
     expect(transformed).toHaveProperty('username')
     expect(transformed).toHaveProperty('date')
+    expect(transformed).toHaveProperty('likeCount')
     expect(transformed.id).toEqual(commentData.id)
     expect(transformed.content).toEqual('**komentar telah dihapus**')
     expect(transformed.username).toEqual(commentData.username)
     expect(transformed.date).toEqual(commentData.created_at)
+    expect(transformed.likeCount).toEqual(1)
   })
 
   it('should return **balasan telah dihapus** when have parent and deleted', async () => {
@@ -373,6 +420,7 @@ describe('GetByIdThreadUseCase', () => {
       content: 'comment',
       username: 'user1',
       created_at: currDate,
+      likes: 1,
       parent: 'comment-parent-1',
       deleted_at: currDate
     }
@@ -380,6 +428,7 @@ describe('GetByIdThreadUseCase', () => {
     /** creating dependency of use case */
     const mockThreadRepository = new ThreadRepository()
     const mockThreadCommentRepository = new ThreadCommentRepository()
+    const mockThreadCommentLikeRepository = new ThreadCommentLikeRepository()
 
     /** mocking needed function */
     mockThreadRepository.getById = jest.fn()
@@ -388,11 +437,14 @@ describe('GetByIdThreadUseCase', () => {
       .mockImplementation((id) => Promise.resolve())
     mockThreadCommentRepository.getReplyByCommentId = jest.fn()
       .mockImplementation((id) => Promise.resolve())
+    mockThreadCommentLikeRepository.countByCommentId = jest.fn()
+      .mockImplementation((commentId) => Promise.resolve(1))
 
     // create use case instance
     const getByIdThreadUseCase = new GetByIdThreadUseCase({
       threadRepository: mockThreadRepository,
-      threadCommentRepository: mockThreadCommentRepository
+      threadCommentRepository: mockThreadCommentRepository,
+      threadCommentLikeRepository: mockThreadCommentLikeRepository
     })
 
     // Action
@@ -403,9 +455,11 @@ describe('GetByIdThreadUseCase', () => {
     expect(transformed).toHaveProperty('content')
     expect(transformed).toHaveProperty('username')
     expect(transformed).toHaveProperty('date')
+    expect(transformed).toHaveProperty('likeCount')
     expect(transformed.id).toEqual(commentData.id)
     expect(transformed.content).toEqual('**balasan telah dihapus**')
     expect(transformed.username).toEqual(commentData.username)
     expect(transformed.date).toEqual(commentData.created_at)
+    expect(transformed.likeCount).toEqual(1)
   })
 })
