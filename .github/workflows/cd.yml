@@ -18,6 +18,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
+            sudo su
             cd ~/Hapi-Forum
             git pull origin main
             npm install
