@@ -1,5 +1,5 @@
 const tableName = 'thread_comments'
-const fkNameThread = 'fk_thread_comments.thread'
+// const fkNameThread = 'fk_thread_comments.thread'
 const fkNameOwner = 'fk_thread_comments.owner'
 const fkNameParent = 'fk_thread_comments.parent'
 

@@ -10,7 +10,7 @@ describe('/authentications endpoint', () => {
     await pool.end()
   })
 
-  afterEach(async () => {
+  beforeEach(async () => {
     await UsersTableTestHelper.cleanTable()
     await AuthenticationsTableTestHelper.cleanTable()
   })
